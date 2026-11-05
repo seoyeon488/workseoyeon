@@ -312,10 +312,13 @@ def test_withheld_step_keeps_other_valid_transitions_as_issues():
         ("T2", "INFO_MISSING", "BLOCKED_FAILURE", ("authority:policy", "reason:sources_exhausted"))]
 
 
-def test_decline_rule_matches_decision_state():
+def test_decline_rule_is_the_shared_detector_and_covers_decision_state():
+    """is_declined는 answers.answer_outcome과 같은 규칙. decision_state._declined가 무응답으로 보는 답을 모두 포함 (더 넓음)."""
     from ctrec.decision_state import _declined
-    for text in ("모름", " 모름 ", "Unknown", "UNKNOWN", "", "거부", "ECOG 1", "모름. 기억 안 남"):
-        assert rp.is_declined(text) == _declined(text), text
+    from ctrec.engine.answers import answer_outcome
+    for text in ("모름", " 모름 ", "Unknown", "UNKNOWN", "", "거부", "ECOG 1", "모름. 기억 안 남", "잘 모르겠어요"):
+        assert rp.is_declined(text) == (answer_outcome(text)[0] == "no_response"), text
+        assert not _declined(text) or rp.is_declined(text), text
 
 
 # ------------------------------------------------------------ 정책 전이·저장·로드

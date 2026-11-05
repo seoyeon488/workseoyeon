@@ -18,6 +18,11 @@
   source_reference.kind == "answer" 이고 ref가 질문의 source_ref와 정확히 같은 것. 인용문 일치만으로는 귀속하지 않음.
 - 귀속하지 못한 새 사실은 지우거나 숨기지 않고 unattributed_fact 진단으로 남김. 무응답 표지("모름" 등)를 인용한 사실은
   decline_marker_fact 진단(실제 스냅샷에 있음을 보존하되 답변의 결과로 세지 않음). fact_version_after는 실제 값 그대로.
+- 답변 인용이 불확실 표현(E9의 hedged: "글쎄요", "기억이 안 나요" 등)이면 출처가 맞아도 행동의 결과로 세지 않고
+  uncertain_answer_fact 진단으로 남김. 인용 전체를 보므로 "손목 수술은 했는데 종류는 몰라요"처럼 사실이 섞인 인용도
+  세지 않는 보수적 동작입니다 (사실은 지우지 않음. docs/dev/wp7_answer_outcome.md).
+- 기록은 관찰을 고치지 않습니다: 무응답·불확실 인용을 근거로 든 판정은 그대로 싣고 criterion_cites_unreliable_answer 진단을
+  남깁니다. 저장 자체를 막는 일은 profile_facts의 몫이며 이 진단이 대신하지 않습니다.
 """
 
 from __future__ import annotations
@@ -30,18 +35,19 @@ from typing import Iterable, Literal, Mapping
 
 from pydantic import Field, model_validator
 
-from ..decision_state import DECLINED_ANSWERS
 from ..fact_changes import FactSnapshot
+from .answers import is_non_answer
 from .cohort_state import CohortState
-from .contracts import (ALIAS_PATTERN, CODE_PATTERN, CONFIRMED, CRITERION_KEY_PATTERN, ID_PATTERN, ZERO_COST, Action,
-                        ActionOutcome, CriterionChange, CriterionResult, DecisionRecord, EffortCost, PairKey,
-                        PairStatus, PairTransition, TransitionError, _Frozen, check_transition)
+from .contracts import (ALIAS_PATTERN, CODE_PATTERN, CONFIRMED, CRITERION_KEY_PATTERN, ID_PATTERN, ITEM_FAILURE_CODES,
+                        NO_ANSWER, SOURCE_FAILURE_CODES, ZERO_COST, Action, ActionOutcome, CriterionChange,
+                        CriterionResult, DecisionRecord, EffortCost, PairKey, PairStatus, PairTransition,
+                        TransitionError, _Frozen, check_transition)
 
 PRODUCER_VERSION = "record_producer/0.1"
 ISSUES_FILE = "decision_record_issues.jsonl"
 FACT_ID_RE = re.compile(r"^F-[0-9a-f]{12}$")  # fact_store.FactStore.add가 만드는 형식
 DETAIL_RE = re.compile(r"^[a-z0-9_]{1,40}(:[a-z0-9_]{1,40})?$")  # 보조 코드 (값·원문 아님)
-NO_ANSWER_ERROR = "no_answer"
+NO_ANSWER_ERROR = NO_ANSWER
 REUSE_REASON = "not_reevaluated"
 REEVALUATION_REASON = "reevaluated_by_executor"
 
@@ -52,9 +58,18 @@ StepStatus = Literal["recorded", "recorded_with_warnings", "contract_violation"]
 # 보류)와 다른 개념. BLOCKED_FAILURE 전이는 계약상 정상 전이이며 기록의 PairTransition으로 남음.
 
 
-def is_declined(text: str) -> bool:
-    """무응답·거부 표지 (decision_state._declined와 같은 규칙: 앞뒤 공백 제거 + casefold 후 DECLINED_ANSWERS)."""
-    return text.strip().casefold() in DECLINED_ANSWERS
+def is_declined(text: str | None) -> bool:
+    """무응답·거부 표지. 판별은 engine.answers.answer_outcome과 같은 규칙 하나 (WP5). 이 이름은 호출 쪽 호환용."""
+    return is_non_answer(text)
+
+
+def answer_quote_problem(source) -> str | None:
+    """답변 인용이 사실의 근거가 못 되는 이유: "non_answer" | "uncertain" | None. 인용이 없거나 답변 출처가 아니면 None."""
+    from ..evidence_directness import hedged  # 지연 import: answers의 question_contract와 같은 이유 (무거운 모듈)
+    quote = (source.quote or "").strip()
+    if source.kind != "answer" or not quote:
+        return None
+    return "non_answer" if is_declined(quote) else "uncertain" if hedged(quote) else None
 
 
 class ObservationError(ValueError):
@@ -85,7 +100,8 @@ class StepObservation:
     facts_before: FactSnapshot
     facts_after: FactSnapshot
     asked: AskedQuestion | None = None  # 질문 행동을 실제로 보냈을 때
-    error_code: str | None = None  # execution="failed"일 때 실행기가 관찰한 오류 코드
+    # 실행기가 관찰한 오류 코드. execution="failed"면 필수. "declined"면 실패 범위 코드만 받고, 없으면 no_answer(항목 단위)
+    error_code: str | None = None
     reevaluated_trials: frozenset[str] = frozenset()  # 실제로 다시 판정한 시험 (그 시험의 기준 전체)
     reevaluated_criteria: frozenset[str] = frozenset()  # 기준 단위로 다시 판정한 키 "<trial>:<rule>" (WP4 이후)
     explicit_fact_links: tuple[str, ...] = ()  # 실행기가 이 행동의 결과로 직접 연결한 fact_id
@@ -193,6 +209,11 @@ def _check_observation(obs: StepObservation) -> str:
             raise ObservationError("asked_but_not_executed")
     if obs.execution == "failed" and not obs.error_code:
         raise ObservationError("failed_requires_error_code")
+    if obs.error_code is not None and obs.execution not in ("declined", "failed"):
+        raise ObservationError("error_code_without_failure")
+    if (obs.execution == "declined" and obs.error_code is not None
+            and obs.error_code not in ITEM_FAILURE_CODES | SOURCE_FAILURE_CODES):
+        raise ObservationError("declined_error_code_unknown")  # 모르는 코드는 정책에서 정보원 단위가 되므로 받지 않음
     if obs.execution in ("not_executed", "proposed") and (obs.cost != ZERO_COST or obs.charge_keys):
         raise ObservationError("unexecuted_action_charged")
     if obs.execution in ("declined", "failed", "not_executed", "proposed") and obs.explicit_fact_links:
@@ -213,6 +234,7 @@ class FactAttribution:
     decline_markers: tuple[str, ...]  # 무응답 표지를 인용한 새 사실
     unattributed: tuple[tuple[str, str], ...]  # (fact_id, source_kind)
     removed: tuple[str, ...]  # before에 있었는데 after에 없는 fact_id (사실은 추가만 되어야 함)
+    uncertain: tuple[str, ...] = ()  # 불확실 표현을 인용한 새 답변 사실
 
 
 def attribute_facts(obs: StepObservation) -> FactAttribution:
@@ -226,19 +248,23 @@ def attribute_facts(obs: StepObservation) -> FactAttribution:
     if unknown:  # 실제 스냅샷 차이에 없는 ID (정답 데이터 ID, 이전 사실, 오타 등)는 받지 않음
         raise ObservationError("linked_fact_not_in_snapshot_diff")
     ref = obs.asked.source_ref if obs.asked is not None else None
-    attributed, markers, unattributed = [], [], []
+    attributed, markers, uncertain, unattributed = [], [], [], []
     for fid in new:
         f = after[fid]
         src = f.source_reference
-        quote = (src.quote or "").strip()
-        if obs.execution == "answered" and (fid in obs.explicit_fact_links
-                                            or (ref is not None and src.kind == "answer" and src.ref == ref)):
+        problem = answer_quote_problem(src)  # 답한 행동이어도 적용 ("EGFR는 모름, ECOG는 1"의 "모름")
+        if problem == "non_answer":
+            markers.append(fid)
+        elif problem == "uncertain":
+            uncertain.append(fid)
+        elif obs.execution == "answered" and (fid in obs.explicit_fact_links
+                                              or (ref is not None and src.kind == "answer" and src.ref == ref)):
             attributed.append(fid)
-        elif src.kind == "answer" and is_declined(quote):
+        elif src.kind == "answer" and is_declined(src.quote):
             markers.append(fid)
         else:
             unattributed.append((fid, src.kind))
-    return FactAttribution(tuple(attributed), tuple(markers), tuple(unattributed), removed)
+    return FactAttribution(tuple(attributed), tuple(markers), tuple(unattributed), removed, tuple(uncertain))
 
 
 # ---------------------------------------------------------------------------
@@ -264,7 +290,7 @@ def _outcome(obs: StepObservation, attr: FactAttribution) -> ActionOutcome | Non
         return None
     status = {"answered": "succeeded", "declined": "no_response", "failed": "failed",
               "not_executed": "not_executed"}[obs.execution]
-    err = NO_ANSWER_ERROR if obs.execution == "declined" else obs.error_code if obs.execution == "failed" else None
+    err = (obs.error_code or NO_ANSWER_ERROR) if obs.execution == "declined" else obs.error_code
     extra = {} if obs.latency_minutes is None else {"latency_minutes": obs.latency_minutes}
     return ActionOutcome(action_id=obs.action.action_id, status=status,
                          new_fact_ids=attr.attributed if status == "succeeded" else (), cost_charged=obs.cost,
@@ -282,6 +308,8 @@ def build_step(obs: StepObservation) -> StepResult:
     issues: list[RecordIssue] = []
     for fid in attr.decline_markers:
         issues.append(_issue(obs, "decline_marker_fact", "warning", fid, fact_ids=(fid,), detail=("source_kind:answer",)))
+    for fid in attr.uncertain:
+        issues.append(_issue(obs, "uncertain_answer_fact", "warning", fid, fact_ids=(fid,), detail=("source_kind:answer",)))
     for fid, kind in attr.unattributed:
         issues.append(_issue(obs, "unattributed_fact", "warning", fid, fact_ids=(fid,), detail=(f"source_kind:{kind}",)))
     if attr.removed:
@@ -316,6 +344,14 @@ def build_step(obs: StepObservation) -> StepResult:
             reason_code=REEVALUATION_REASON if is_re else REUSE_REASON,
             evaluator_version=after_c.evaluator_version if (is_re and after_c) else None,
             evidence_fact_ids=tuple(after_c.evidence_fact_ids) if (is_re and after_c) else ()))
+
+    unreliable = {f.fact_id: p for f in obs.facts_after.facts if (p := answer_quote_problem(f.source_reference))}
+    for c in changes:  # 이전 단계에서 저장된 사실을 인용해도 잡도록 새 사실이 아니라 스냅샷 전체를 봄
+        cited = tuple(i for i in c.evidence_fact_ids if i in unreliable)
+        if cited and c.after in ("MET", "NOT_MET"):
+            issues.append(_issue(obs, "criterion_cites_unreliable_answer", "warning", c.criterion_key,
+                                 criterion_key=c.criterion_key, trial_id=c.criterion_key.split(":", 1)[0], after=c.after,
+                                 fact_ids=cited, detail=tuple(sorted({f"quote:{unreliable[i]}" for i in cited}))))
 
     policy_by_trial = {p.pair.trial_id: p for p in obs.policy_transitions}
     transitions: list[PairTransition] = []

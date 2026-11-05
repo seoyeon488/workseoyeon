@@ -148,8 +148,8 @@ def test_violation_step_marks_run_incomplete_and_keeps_every_change(tmp_path, mo
 def _source_level_failures(monkeypatch):
     """무응답을 연락 불가(정보원 단위)로 기록하게 함. WP5 이후 "모름"(no_answer)은 항목 단위 실패라 masked 사례에서
     정보원 소진 -> BLOCKED_FAILURE 정책 전이가 생기지 않으므로, 정책 전이가 있는 실행이 필요한 테스트는 이 경로로 만듦."""
-    from ctrec.engine import contracts as C
-    monkeypatch.setattr(rp, "NO_ANSWER_ERROR", C.UNREACHABLE)  # offline_records.settle과 생산기가 같은 상수를 읽음
+    from ctrec.engine import answers, contracts as C
+    monkeypatch.setattr(answers, "NO_ANSWER", C.UNREACHABLE)  # settle이 판별한 코드가 정책과 기록에 똑같이 감
 
 
 def test_coverage_check_detects_dropped_transition(tmp_path, monkeypatch):

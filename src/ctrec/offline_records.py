@@ -26,6 +26,7 @@ from . import question_eval as qe
 from .decision_state import SessionView, build_state
 from .engine import audit
 from .engine import record_producer as rp
+from .engine.answers import answer_outcome
 from .engine.cohort_state import CohortState, OpsState
 from .engine.contracts import ActionOutcome, EffortBudget
 from .engine.cost import EffortLedger
@@ -57,6 +58,7 @@ class _Round:
     cost: object
     charge_key: str | None
     policy_transitions: tuple | None = ()  # None = 응답을 찾지 못해 처리 불가
+    outcome: ActionOutcome | None = None  # 정책에 넘긴 응답 결과. 기록도 이 값을 씀 (답을 다시 판별하지 않음)
     settled: bool = False  # 응답을 운영 상태에 반영했는가 (한 번만)
 
 
@@ -128,10 +130,9 @@ class _Recorder:
             self.unsupported.append(f"answer_not_found_round_{rd.round}")
             rd.policy_transitions = None
             return
-        declined = rp.is_declined(qa[0].answer)  # 생산기와 같은 규칙 (decision_state._declined)
-        outcome = ActionOutcome(action_id=rd.action.action_id, status="no_response" if declined else "succeeded",
-                                error_code=rp.NO_ANSWER_ERROR if declined else None)
-        new, transitions = self.policy.apply_outcome(rd.cohort, rd.action, outcome)
+        status, error_code = answer_outcome(qa[0].answer)  # 답의 판별은 이 함수 하나 (WP5). 답만으로는 항목 단위까지만 앎
+        rd.outcome = ActionOutcome(action_id=rd.action.action_id, status=status, error_code=error_code)
+        new, transitions = self.policy.apply_outcome(rd.cohort, rd.action, rd.outcome)
         self.ops[rd.action.patient_alias] = new.ops[rd.action.patient_alias]
         rd.policy_transitions = tuple(transitions)
 
@@ -168,7 +169,8 @@ def _observations(rec: _Recorder, s, run_id: str, final_snap, final_co) -> list[
         qa = next(p for p in s.qa_log if p.round == rd.round and p.question_id == QUESTION_ID)
         out.append(rp.StepObservation(
             run_id=run_id, step=i + 1, action=rd.action,
-            execution="declined" if rp.is_declined(qa.answer) else "answered",
+            execution="answered" if rd.outcome.status == "succeeded" else "declined",
+            error_code=rd.outcome.error_code,
             asked=rp.AskedQuestion(question_id=qa.question_id, action_id=rd.action.action_id,
                                    target_criteria=tuple(qa.target), purpose=qa.purpose, source_ref=None),
             before=rd.cohort, after=nxt_co, facts_before=rd.snapshot, facts_after=nxt_snap,

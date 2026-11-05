@@ -599,6 +599,24 @@ python scripts/generate_synthetic_patients.py --trial data/trials/NCT0XXXXXXX.js
 
 수정할 때마다 무엇을 왜 바꿨는지 여기에 기록합니다. 최신 항목이 위에 옵니다.
 
+### 2026-11-05 — WP7: 감사 기록이 WP5 공통 응답 판별기를 쓰도록 통일 (PR #10 선행)
+
+배경: `record_producer.is_declined`는 `decision_state.DECLINED_ANSWERS` 정확 일치만 보아 "잘 모르겠어요"·"모름(답변 없음)"을 답변으로 분류했고, 오프라인 실행기는 정책용·기록용으로 답을 두 번 판별했습니다. 생산기는 무응답의 `error_code`를 `no_answer`로 고정해 연락 불가·전체 거부를 정책과 같은 코드로 기록할 수 없었습니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | `is_declined`가 `engine.answers.is_non_answer`를 사용. `NO_ANSWER_ERROR`는 `contracts.NO_ANSWER` | `src/ctrec/engine/record_producer.py` |
+| 2 | `StepObservation.error_code`를 `declined`에서도 받음(`no_answer`·`unreachable`·`declined_all`만, 없으면 `no_answer`). 실패가 아닌 실행에 코드를 넘기면 관찰 오류. 기록 스키마는 그대로 | `src/ctrec/engine/record_producer.py` |
+| 3 | 답한 행동이어도 무응답·불확실을 인용한 답변 사실은 행동 결과로 세지 않고 `decline_marker_fact`·`uncertain_answer_fact` 진단으로 남김(사실은 지우지 않음). 판정이 이런 사실을 인용하면 `criterion_cites_unreliable_answer` 진단 | `src/ctrec/engine/record_producer.py` |
+| 4 | `settle`이 `answer_outcome`으로 한 번만 판별하고, 기록은 정책에 넘긴 결과를 그대로 사용 | `src/ctrec/offline_records.py` |
+| 5 | 연동 테스트 추가, 판별 규칙 테스트와 정보원 단위 실패 재현 방법 조정 | `tests/test_answer_outcome_records.py`, `tests/test_record_producer.py`, `tests/test_offline_records.py` |
+| 6 | 동작 설명과 미해결 P0 재현 기록 | `docs/dev/wp7_answer_outcome.md`, `tests/test_p0_profile_facts_gate.py` |
+
+- masked 101건 오프라인 집계는 변경 전후 동일합니다(기본 답변 대역의 무응답이 정확히 "모름"이라 판별 차이가 나타나지 않음).
+- 혼합 인용("손목 수술은 했는데 종류는 몰라요" 전체)은 사실이 섞여 있어도 세지 않는 보수적 동작입니다.
+- **미해결 P0:** `profile_facts` 저장 관문이 미인식 무응답에서 추출한 값을 막지 못하고, 그 값이 자기 보고 허용 기준에서 `CONFIRMED_ELIGIBLE`까지 이어질 수 있습니다(스텁 재현, 실제 LLM 발생 빈도 미검증). 이번 변경은 이를 해결하지 않습니다. 수정은 소유자와 협의가 필요합니다. `docs/dev/wp7_answer_outcome.md` §4.
+- 남은 일: `decision_state._declined`·`inspector.DECLINED` 통일 여부 결정, 복합 무응답("모름. 기억 안 남")·"글쎄요"는 `question_contract.non_answer`가 아직 답변으로 분류.
+
 ### 2026-11-04 — WP5: "모름"을 정보원 전체 실패가 아니라 항목 단위 실패로 (DCV+C 정책 엔진)
 
 배경: 오프라인 실행에서 환자가 질문 하나에 "모름"이라고 답하면(답하지 않은 질문도 기본값이 "모름") 정책이 그 환자의 문진 정보원 전체를 실패로 표시해, 다른 내용의 질문까지 멈추고 대상 시험을 `BLOCKED_FAILURE`로 보류했습니다. 로드맵 M2·M9("모름은 보존하되 같은 질문을 반복하지 않고 다른 정보원을 찾은 뒤 보류")와 맞지 않았습니다.
