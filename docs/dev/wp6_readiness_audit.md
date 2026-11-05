@@ -1,6 +1,6 @@
 # WP6 실험 재현성·평가 파이프라인 감사
 
-> 2026-11-05 · 기준 `origin/integration/dcvc` `0b402c6` · 브랜치 `audit/wp6-experiment-readiness` (커밋·push 없음)
+> 2026-11-05 · 감사 기준: `integration/dcvc` `0b402c6` · 브랜치 `audit/wp6-experiment-readiness`
 > 범위: 분석·문서 작성만. 소스·테스트·데이터 변경 0, 외부 LLM·유료 API 호출 0, 실제 환자 데이터 사용 0.
 > 이 문서의 수치는 모두 오프라인 대역 실행이거나 저장소 문서에서 옮긴 값이며, 임상 성능이 아닙니다.
 
