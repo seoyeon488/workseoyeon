@@ -599,6 +599,201 @@ python scripts/generate_synthetic_patients.py --trial data/trials/NCT0XXXXXXX.js
 
 수정할 때마다 무엇을 왜 바꿨는지 여기에 기록합니다. 최신 항목이 위에 옵니다.
 
+### 2026-11-06 — WP8 실행기 리뷰 후속: 상충 확인을 화면 질문으로 보내지 않음, "모름" 표현 차이·문서 요청 반복 수정
+
+배경: 선우 대신 독립 리뷰를 돌린 결과, 엔진 모드(`CTREC_POLICY_MODE=engine`)에서 결함 3건이 재현됐습니다. 기본 모드는 영향이 없습니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | **상충 근거의 출처 확인(VERIFY_RECORD, 안전 필수)을 화면 사용자에게 "기록 확인 요청" 자유 입력으로 보내지 않음.** 이 확인은 사실 출처를 코드로 대조하는 일인데, 질문으로 바꾸면 이미 상충한 기준에 자기 보고 사실이 하나 더 쌓이고, "모름"이면 항목 실패로 기록돼 결국 보류됐습니다. 이제 실행하지 않고 `("engine", "safety_not_executed")`로 알립니다 | `src/ctrec/web/engine_runner.py` |
+| 2 | **"모름" 표현 차이:** 엔진은 "잘 모르겠어요"·"확인할 수 없습니다"도 무응답으로 보지만, 기존 정책은 좁은 목록(`DECLINED_ANSWERS`)만 "모름"으로 봐서 재추출(REPARSE, 웹에서 실행 불가)에 머물렀습니다. 엔진이 그 항목의 실패를 기록했으면 기존 정책의 재추출(`answered_not_reflected`)·보류(`answered_but_unresolved`)에도 같은 대체 문서 규칙을 적용합니다 | `src/ctrec/engine/policy.py` |
+| 3 | **같은 문서 요청 반복:** 문서 요청에 답이 있었는데 gap이 남으면 같은 (문서, 항목)을 매 라운드 다시 요청했습니다(9라운드에 5번). 답이 있었던 문서 요청을 `ops.attempts`의 `tried:<정보원>|<항목>`으로 기록하고, 다음 문서 정보원으로 넘기거나 없으면 그 항목만 보류(`requested_documents_unresolved`)합니다. 쌍 상태는 바꾸지 않습니다 | `src/ctrec/engine/policy.py` |
+| 4 | 테스트 4건(수정 전에는 모두 실패) | `tests/test_engine_runner.py` |
+
+- 남은 한계(이번 범위 밖): 웹의 답변 시간 초과는 모든 질문을 "모름"으로 넘겨 항목 단위 실패로 기록됩니다(부재는 정보원 단위에 가까움). info_key가 없는 항목은 질문과 재추출의 지문이 달라 2번 규칙이 연결되지 않습니다. 실패 항목 키를 공유하는 다른 시험의 상태 변화는 전이 기록에 남지 않습니다.
+
+### 2026-11-06 — 판정·쌍 상태·추천·검토 행동의 일치 점검, '기준 없음'과 '평가 실패' 문구 구분 (#17 후속)
+
+배경: 선우가 #17 이후 "Matcher 판정, PairStatus, 추천, 검토 행동이 서로 일치하는지" 확인을 요청했습니다. 고정 사례 101건(140쌍)을 엔진 모드 실제 Session(오프라인 대역)으로 돌린 결과 불일치는 0건이었지만, 대역 특성상 거의 모든 쌍이 정보 없음 상태라 점검력이 약했습니다. 그래서 E-1의 합성 시험(R1·R3·R5·R6·R7)으로 층별 일치를 테스트로 고정했습니다. 또 기준이 없어서 판정하지 못한 시험이 화면에 처리 오류와 같은 '평가 실패'로 보이던 문제(선우 §5)를 고쳤습니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | 네 층 일치 규칙(`confirmed_not_match`·`match_not_confirmed`·`ranked_closed`·`unreviewed`·`no_action`)과 합성 시험별 검증. R1·R3·R6·R7은 불일치 0. R5(절차 기준만)는 Session이 CRITERIA_MATCH·추천 1순위이고 엔진은 NOT_EVALUATED인 **알려진 불일치**로 기록(팀 결정 P1/P2/P3 대기). 엔진은 담당자 검토(`no_required_criteria`)를 냄 | `tests/test_status_consistency.py` (신규) |
+| 2 | 결과 화면 사본의 NOT_EVALUATED 문구: 원인 코드가 `criteria_parse_empty`면 "기준 해석 결과가 비어", `no_source_criteria`면 "시험에 평가할 기준이 없어" 판정하지 못함(부적격 아님). 처리 오류는 기존 "평가 실패로" 그대로. 판정 값·원인 코드는 바꾸지 않음. 배지(`app.js`의 '평가 실패')와 `status.py` 라벨은 그대로 | `src/ctrec/web/display.py`, `tests/test_empty_criteria.py`(기대 문구 1줄) |
+
+- 이 브랜치는 #18과 #17을 합친 위에 있습니다. #17·#18 다음에 병합합니다.
+
+### 2026-11-06 — 필수 기준이 0개인 쌍을 담당자 검토로 보냄 (#14·#17 후속)
+
+배경: #14는 판정에 적용된 필수 기준이 0개인 쌍(파싱 결과 빔·절차 기준만 있음 등)을 확정 적격이 아니라 NOT_EVALUATED로 둡니다. 그런데 기존 정책(`decision_policy`)은 Matcher 판정 값만 보므로, Matcher가 ELIGIBLE을 준 이 쌍에는 아무 행동도 내지 않았습니다. 현황판에 "평가 안 됨"으로 남을 뿐 누구도 확인하지 않는 상태였습니다. #17 검토 중 R5 선택지 P2(필수 기준 없으면 UNCERTAIN)도 같은 문제(행동 없는 INFO_MISSING)를 만든다는 점을 확인했습니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | 판정에 적용된 필수 기준이 0개이고 Matcher 판정이 ELIGIBLE·UNCERTAIN인 모집 중 쌍에 `CLINICIAN_REVIEW(no_required_criteria)`를 환자당 한 건(해당 시험 묶음) 더함. 단계·비용은 기존 `evaluation_failed` 검토와 같음. 판정·쌍 상태는 바꾸지 않음. Matcher가 NOT_EVALUATED를 준 시험(#17)은 기존 `evaluation_failed` 검토가 맡으므로 중복되지 않음 | `src/ctrec/engine/policy.py` |
+| 2 | 테스트: 기준 0개·절차 기준만·기준 0개 UNCERTAIN은 검토 대상, 정상 대조군·모집 종료 시험은 제외, 결정적, 선택되고 결과 반영 뒤에도 판정 불변, 일반 코호트에는 추가되지 않음 | `tests/test_engine_policy.py` |
+
+- 이 브랜치는 PR #16 위에 있습니다. 웹 엔진 모드(#15)에서 이 행동은 화면에서 실행하지 않고 계획 trace에만 남습니다(임상의 판단 행동과 같은 처리).
+
+### 2026-11-05 — 기준선 정책 4종과 제안 정책 full_dcvc 초안, PolicyEngine 프로토콜 정리 (DCV+C 엔진, WP6 준비)
+
+배경: #13(WP6 준비 상태 점검)에서 정책 비교 실험에 필요한 기준선·제안 정책이 코드에 없다고 지적됐습니다. 기준선은 로드맵 M10에서 이미 정해진 범위라 먼저 구현했고, full_dcvc는 정의 합의 전 초안으로 스위치를 두어 나중에 바꾸기 쉽게 했습니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | 기준선 `no_action`·`random`(seed·행동 ID 해시 순위, 공통 난수)·`patient_order`(환자별 독립)·`cheapest_first`. 모두 같은 후보(`propose`)·결과 반영(`apply_outcome`)·안전 필수 우선·예산 규칙을 쓰고 남은 예산을 채우는 순서만 다름. 정책 등록표 `make_policy(policy_id)` | `src/ctrec/engine/baselines.py` (신규) |
+| 2 | 제안 정책 초안 `full_dcvc`: DCV = 기존 후보 + 결정 영향 필터(움직일 열린 쌍이 없는 행동 제외, 안전·임상의 검토는 유지), C = 매번 `Σ(1/쌍의 남은 필수 기준 수) ÷ 지금 원장 기준 추가 비용`이 가장 큰 행동. 성공 확률 없음(M9). 스위치 `dcv_impact`·`bundles`·`fairness_floor`·`recovery` | `src/ctrec/engine/dcvc.py` (신규) |
+| 3 | 선택 규칙을 하위 정책이 순서만 바꿀 수 있게 나눔(`floor_minutes`·`fill` 훅, 기존 동작 그대로), 회복 제거 스위치(`recovery=False`: 실패 뒤 바로 보류·소진). 쌍의 남은 필수 기준 수 `CohortState.remaining_required` | `src/ctrec/engine/policy.py`, `src/ctrec/engine/cohort_state.py` |
+| 4 | `PolicyEngine` 프로토콜을 실제 구현과 맞춤: `select(..., cohort)`, `apply_outcome(cohort, action, outcome)` 추가 | `src/ctrec/engine/contracts.py`, `docs/engine_contracts.md`, `tests/test_engine_contracts.py` |
+| 5 | 웹·CLI 엔진 모드의 정책을 같은 등록표에서 고름: `CTREC_POLICY_ID`(기본 `legacy_greedy`, `full_dcvc` 등) (M14) | `src/ctrec/web/engine_runner.py` |
+| 6 | 테스트: 정책별 예산 초과 0·중복 선택 0·결정성·같은 후보 공유·안전 필수 우선과 미실행 시 그 환자 중단, no_action 미실행 보고, random seed 재현·seed별 차이, patient_order 환자 순서, cheapest_first 비용 순서, full_dcvc 필터·점수·스위치 4종, 판정·사실 불변. 실행기: 등록표에서 정책 선택, full_dcvc로 실제 Session 실행 | `tests/test_engine_baselines.py` (신규), `tests/test_engine_runner.py` |
+
+- 이 브랜치는 PR #15(WP8, #10·#14 포함) 위에 있습니다. full_dcvc의 식·기본값은 팀 결정(#13 안건 ①) 뒤 바뀔 수 있습니다.
+
+### 2026-11-05 — WP8: 실제 Session(웹·CLI)의 확인 질문을 정책 엔진이 고르게 연결, "모름" 뒤 대체 문서 요청이 실제로 동작하도록 수정
+
+배경: 선우가 실제 Session 점검에서 "'모름' 뒤 대체 정보원 전환이 동작하지 않음"을 보고했습니다. 확인해 보니 (1) 웹·CLI의 Session은 정책 엔진을 전혀 거치지 않고 기존 LLM 질문 생성기로 질문을 만들었고(엔진은 오프라인 기록기에서만 사용), (2) 엔진에서도 "모름" 뒤 기존 정책이 그 항목을 다시 제안하지 않고 `DEFER(user_declined_or_exhausted)`를 내서, WP5의 대체 문서 요청 규칙(같은 질문이 다시 제안될 때만 동작)이 한 번도 실행되지 않았습니다. 단위 테스트는 질문이 다시 제안되는 상태를 직접 만들어 이 경로를 놓쳤습니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | **엔진 실행기 (W-1~W-7)**: `question_generator.use_generator`(실행별 생성기 교체 장치)로 Session.clarify의 질문 생성 자리만 바꿈. 라운드마다 직전 답 → `answer_outcome` → `apply_outcome`(운영 상태만), Session → CohortState(실행별 salt 별칭) → `propose/select` → 질문화. 환자 문진·의사 참고용 질문은 `render_action`, 문서 요청은 화면 사용자에게 "기록에서 확인해 입력"(입력값은 자기 보고 수준 그대로, 문서 검증으로 올리지 않음). 안전 필수 행동이 예산 부족이면 그 라운드는 질문하지 않고 알림. trace에는 행동 유형·정보원·사유 코드·건수만(행동 ID·별칭·환자 값 없음). 질문 문구는 기준 원문을 넣은 결정적 문장(LLM 없음) | `src/ctrec/web/engine_runner.py` (신규) |
+| 2 | 진입점: `CTREC_POLICY_MODE=engine`일 때만 엔진 모드 (기본 legacy = 기존 동작 그대로). 보호 파일 `pipeline.py`는 고치지 않음 | `src/ctrec/web/app.py`, `src/ctrec/cli.py` |
+| 3 | 정책: 기존 정책의 "모름" 보류(`user_declined_or_exhausted`)도 엔진이 기록한 항목 실패가 있으면 대체 문서 요청(`alternative_source_after_no_answer`)으로, 남은 문서가 없으면 `item_sources_exhausted`. 실패 기록이 없는 보류(엔진 밖의 거부)는 그대로 | `src/ctrec/engine/policy.py` |
+| 4 | 테스트: 정책 단위 1개 + 실행기 9개. 실제 Session.run_fixed(오프라인 대역) E2E — 엔진이 질문을 고르고 LLM 질문 생성기는 부르지 않음, "모름" 뒤 다른 항목 질문 계속·같은 항목 재질문 없음, 그 항목은 문서 정보원으로 이어지고 문서도 못 얻으면 그 항목만 보류, 다른 항목이 남은 동안 BLOCKED 없음, 답한 질문은 실패 아님, 질문 대상·목적 불변, trace에 별칭·환자 ID 없음, 안전 확인 미실행 시 질문 중단, 기본 legacy | `tests/test_engine_policy.py`, `tests/test_engine_runner.py` |
+
+- 이 브랜치는 PR #10(WP5)과 #14(기준 0개 시험 확정 차단)를 포함합니다. 두 PR이 먼저 병합되면 이 PR의 diff는 위 변경만 남습니다. `cohort_state._pair_states`의 두 PR 충돌은 여기서 함께 정리했습니다.
+- 남은 것: 웹 화면의 엔진 모드 표시·실행 모드 선택 UI(지금은 환경 변수), 엔진 결정 기록(DecisionRecord) 생산 연결(W-4 `audit.to_trace`), 질문 문구 다듬기(지금은 기준 원문 그대로), 코디네이터 작업시간 예산 입력.
+- 전체 테스트 2,229 통과 / 0 실패 / 5 건너뜀.
+
+### 2026-11-05 — 평가할 기준이 0개인 시험을 적격 확정으로 올리지 않음 (DCV+C 엔진 안전 수정)
+
+배경: 선우가 실제 Session 점검에서 보고한 안전 문제. 기존 Matcher(`matcher.decide`)는 판정할 기준 목록이 비면(파싱 실패, 코호트 기준만 있음 등) `ELIGIBLE`을 돌려주고, 엔진은 남은 gap이 없으므로 그 쌍을 `CONFIRMED_ELIGIBLE`로 만들었습니다. 평가한 기준 없이 적격 확정이 나는 경로였습니다(M3 안전 제약: 거짓 적격 금지).
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | `derive_pair_status`·`pending_kinds`에 `required_criteria`(판정에 적용된 필수 기준 수). ELIGIBLE인데 0개면 `NOT_EVALUATED`(평가하지 못함, 부적격 아님). `None`(개수를 모르는 호출)은 이전과 같음. 판정 값(eligibility)은 바꾸지 않음 | `src/ctrec/engine/contracts.py` |
+| 2 | 코호트 상태가 쌍마다 required 기준 수(`required_count`)를 넘김. 다른 코호트 기준(alternative_cohort)·절차 기준(waivable)만 있는 시험도 0개로 셈 | `src/ctrec/engine/cohort_state.py` |
+| 3 | 테스트 1개: 계약 수준(0개·1개·None, 다른 판정 값은 그대로)과 코호트 상태 수준(기준 없음·required 없음·required 1개) | `tests/test_engine_contract_v02.py` |
+| 4 | 계약 문서 | `docs/engine_contracts.md` §7, `docs/dev/contract_v02_changelog.md` §2 |
+
+- 보호 파일 `agents/matcher.py`는 건드리지 않았습니다(엔진 상태 계산에서 차단). 기존 결과 화면(`status.py`)의 적격 표시는 이 PR 범위 밖입니다.
+
+### 2026-11-05 — 통합 문서의 소유표 소제목 중복 정리 (PR #7·#8 병합 뒤)
+
+PR #7(`profile_facts.py`)과 #8(`criteria_parser.py`)이 `docs/dev/integration_handoff.md`에 같은 소제목 `### 5.1 이후 작업에서 소유를 정한 파일`을 각각 추가해, 병합 뒤 소제목·표 머리가 두 번 나왔습니다(충돌 표시 없음). 소제목과 표 머리를 하나로 두고 두 행을 한 표에 남겼습니다. 행 내용은 바꾸지 않았습니다(승인자 표기 정정은 서연 후속 PR).
+
+### 2026-11-04 — WP5: "모름"을 정보원 전체 실패가 아니라 항목 단위 실패로 (DCV+C 정책 엔진)
+
+배경: 오프라인 실행에서 환자가 질문 하나에 "모름"이라고 답하면(답하지 않은 질문도 기본값이 "모름") 정책이 그 환자의 문진 정보원 전체를 실패로 표시해, 다른 내용의 질문까지 멈추고 대상 시험을 `BLOCKED_FAILURE`로 보류했습니다. 로드맵 M2·M9("모름은 보존하되 같은 질문을 반복하지 않고 다른 정보원을 찾은 뒤 보류")와 맞지 않았습니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | 실패 범위 코드: `no_answer`(항목 단위), `unreachable`·`declined_all`(정보원 단위), `failure_scope()`. 모르는 코드는 정보원 단위(기존 동작). 계약 필드 변경 없음 (0.2 PROVISIONAL에 상수·함수 추가) | `src/ctrec/engine/contracts.py`, `docs/engine_contracts.md`, `docs/dev/contract_v02_changelog.md` |
+| 2 | 운영 상태에 항목 단위 실패(`failed_items`)와 소진 항목(`exhausted_items`). 쌍은 남은 항목이 모두 소진됐을 때만 `BLOCKED_FAILURE` | `src/ctrec/engine/cohort_state.py` |
+| 3 | 정책: "모름" 뒤 그 항목만 문서 정보원으로 요청(`alternative_source_after_no_answer`), 남은 정보원이 없으면 그 항목만 보류(`item_sources_exhausted`). 같은 정보원의 다른 항목 질문은 계속 | `src/ctrec/engine/policy.py` |
+| 4 | 무응답 판별 통일: `engine.answers.answer_outcome`(= `question_contract.non_answer`). "잘 모르겠어요"·"기억이 안 나요"도 무응답 | `src/ctrec/engine/answers.py` |
+| 5 | 테스트 6개 추가(실패 범위 코드, 항목만 막고 다른 질문 계속, 모든 항목 소진 시에만 쌍 소진, 연락 불가·확인 거부는 정보원 전체, 판별기 하나). WP7 오프라인 테스트 2개는 "모름"으로 만들던 정책 전이를 연락 불가 경로로 재현하도록 조정(선우 리뷰 반영: 내부 상수를 바꾸지 않고, 정책에 실제 `unreachable` 행동 결과를 넣는 테스트용 정책으로) | `tests/test_engine_policy.py`, `tests/test_offline_records.py` |
+
+- masked 101건 오프라인 비교(같은 salt): `BLOCKED_FAILURE` 전이 104 → 0, 문진 정보원 전체가 막힌 환자 101 → 0, 실제 질문 109 → 202(2라운드 모두 사용), 최종 쌍 상태 BLOCKED 104·정보 부족 30·확인 대기 6 → 정보 부족 133·확인 대기 7. 확정 판정 수는 두 경우 모두 0으로, 오프라인 답변 대역이 대부분 "모름"을 돌려주기 때문입니다(이 PR 범위 밖).
+- 전체 테스트 2,058 통과 / 0 실패 / 5 건너뜀 (macOS, `.env` 없는 worktree, `ANTHROPIC_API_KEY=` 빈 값).
+- 후속(소유자 작업): `record_producer.is_declined`·`offline_records`가 `answer_outcome`을 쓰도록(선우), `decision_state._declined`(기존 Decision Loop) 통일 여부 결정.
+
+### 2026-11-05 — 코호트 생성기를 integration/dcvc에 합치고, /cohort 현황판을 엔진 계약의 7가지 쌍 상태로 (연구 · 오프라인)
+
+배경: 연구용 `/cohort` 현황판은 `research/cohort-generator` 브랜치에만 있었고, 쌍 상태를 화면(JS)이 자체 규칙으로 3가지(적격 확정·부적격 확정·미확정)만 나눴습니다. 엔진 계약 0.2의 7가지 `PairStatus`와 기준이 달라 같은 쌍을 시뮬레이터·웹 엔진과 다르게 부를 수 있었습니다(통합 PR 리뷰의 의미 충돌 ③).
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | `research/cohort-generator`(dfd3790)를 그대로 병합(충돌 0). 생성기 코드는 바꾸지 않음 — 이후 정보원 ID 통일·임상의 판단 기준 처리(의미 충돌 ①②)는 생성기 소유자(서연)가 이 위에서 진행 | `src/ctrec/cohort/**`, `data/cohort/**`, `scripts/build_cohort_benchmark.py`, `tests/test_cohort_generator.py`, `patient-screens/` |
+| 2 | **쌍 상태를 서버에서 엔진 계약으로 계산**: 코호트 JSON의 public 부분만 읽어 기준별 gap(정보 없음·검사 오래됨·임상의 판단)을 정하고 `contracts.derive_pair_status`·`pending_kinds`에 넘김. oracle은 쓰지 않음 | `src/ctrec/web/cohort_board.py` (신규), `web/app.py` (`/api/cohorts/{id}` 응답에 `board` 추가) |
+| 3 | 현황판: 상태 7가지(적격 확정·부적격 확정·확인 대기·정보 부족·의료진 검토·확보 실패 보류·미평가) 타일·범례·배지, 상세 화면에 쌍 상태와 남은 작업, 미확인 기준의 이유. 화면은 판정 규칙을 갖지 않음. 정보원은 생성기 ID(`S_*`)와 엔진 I-5 ID를 모두 이름으로 표시(통일 전후 공통) | `web/static/cohort.js`·`cohort.html`·`cohort.css` |
+| 4 | 테스트 11개: 상태별 사례(적격 확정, 불충족 하나로 부적격 확정, 정보 부족, 검사 오래됨, 임상의 판단 3가지 경로, 우선순위), 엔진 계약과 일치, oracle을 지워도 같은 결과, API 응답, 화면이 자체 판정 규칙을 갖지 않음 | `tests/test_cohort_board.py` |
+
+- 정적 생성 데이터에는 확보 실패 보류가 생기지 않습니다(실제 확인을 진행하는 시뮬레이터·웹에서 생김). 같은 7가지 체계로 0건을 표시합니다.
+- 슬롯에 연결된 기준이 0개인 시험은 확정 근거가 없으므로 `NOT_EVALUATED`로 표시합니다(PR #14와 같은 규칙, `required_criteria`). 그래서 이 PR은 #14 뒤에 병합해야 합니다.
+- 화면 확인: 1280px(라이트)·390px(다크) 가로 넘침 0, 콘솔 오류 없음.
+
+### 2026-11-02 — 환자 화면 시안 HTML 보관 (프론트엔드)
+
+- `patient-screens/`에 2026-10-24에 만든 환자 화면 정적 시안 4개를 저장소에 추가했습니다: `index.html`(문답), `results.html`(추천 결과), `detail.html`(시험 상세와 내 조건), `upload.html`(서류 확인 완료). 현재 웹 화면(`web/static/`)의 설계 참고용이며 서버가 제공하지 않습니다. 내용은 모두 가상 예시이고 환자 정보는 없습니다(Google Fonts를 외부에서 불러옴).
+
+### 2026-11-01 — 합성 코호트 생성기 설명 정정 3건 (연구 · 문서·주석만, 동작 변경 없음)
+
+배경: 팀 통합 회의안건(「TRIALOG 통합 연구 제안 — Evidence-Aware Cohort Verification」 5.2·부록 6.3)이 생성기 설계의 근거 세 가지를 지적했고, 검토 결과 모두 타당했습니다.
+
+| # | 정정 | 파일 |
+|---|---|---|
+| 1 | **영(null) 시나리오**: "코호트 정책이 이길 이유가 없는 조건, 차이가 나면 버그"를 철회. 시험 겹침·비용 차이·소스 묶음·정원을 없앤 **대조 조건**이며, 환자마다 남은 미확인 수가 다르면 예산 배분만으로도 정책 간 차이가 정상적으로 생길 수 있음. 시뮬레이터 정확성은 작은 사례의 완전탐색 최적값과 비교해 확인 | `src/ctrec/cohort/spec.py`·`generate.py` 주석, `web/static/cohort.js` 배지 문구, 팀 공유 설계안·제안서 |
+| 2 | **적격률 근거**: "등록 1명당 3~13명 스크리닝"(Penberthy 2012)에서 적격률 8~33%를 역산한 근거를 철회. 동의·모집 마감 등 비의학적 요인이 섞인 수치라 의학적 적격률이 아님. 적격률은 근거 없는 가정 범위로 표시하고 민감도 분석 | 팀 공유 설계안·제안서, README(이 절의 "문헌 범위" 표현) |
+| 3 | **규칙 엔진 정답 = 독립 검증 아님**: 생성기와 규칙 엔진이 같은 해석을 공유하므로 엔진 계산은 구현 일관성 확인일 뿐. 독립 검증은 기준 원문–슬롯–논리식의 사람 검수(검수자·날짜·근거 기록) | 팀 공유 설계안 |
+
+- 코드 동작·생성 결과는 바뀌지 않습니다(주석과 화면 문구만). 완전탐색 대조 테스트는 시뮬레이터를 만들 때 추가합니다.
+
+### 2026-11-01 — 합성 코호트 생성기: 슬롯 사전 1차 검수 반영, 조건 묶음·검사 유효 기간 지원 (연구 · 오프라인 평가 전용)
+
+배경: 검수자가 판단이 필요한 초안 13개를 검토했습니다. 그중 "Hb >80 g/L(7일 이내, 성장인자·수혈 없이)"의 조건을 무시하면 안 된다는 의견과 "면역 결핍에 약물성 면역저하도 포함"이라는 의견은 기준 하나에 조건이 여러 개 걸리는 경우라, 기존 '기준 하나 = 슬롯 하나' 구조로는 표현할 수 없었습니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | **조건 묶음**: 주 조건 + 추가 조건(`also`)을 `all`(모두)/`any`(하나라도)로 묶음. 정책이 보는 상태는 3값 논리(all: 하나라도 불성립이면 나머지를 몰라도 불성립, any: 하나라도 성립이면 성립) | `src/ctrec/cohort/spec.py`, `truth.py` |
+| 2 | **검사 유효 기간**: 기간 조건이 있는 검사 기준은 환자의 마지막 검사 시점(`lab_age_days`, 항상 공개)을 보고, 유효 기간이 지났으면 값이 있어도 '미확인'(새 결과지 필요). 정답은 값이 그대로라고 가정. 자동 연결 기준에도 적용되어 NCT07087314 I8·I9(7일)도 이제 기간을 봄 | `truth.py`, `generate.py`, `validate.py`, `slots.py` |
+| 3 | **검수 반영**: reviewed 10개(스테로이드 절약제 5개, NCT06125405 E10·E11, NCT06530004 E5·E7, NCT07087314 I7). 질문·해석 확인 대기 3개(NCT06125405 E4 혈소판 단위, I7 오비누투주맙, NCT06530004 I2 '완전한 임상 자료' 정의 제안)는 draft 유지. 결정 원본은 검수 기록 CSV로 남기고 슬롯 사전은 그 기록에서 다시 만듦 | `data/cohort/review_decisions_nephrotic_peds.csv`, `llm_draft_nephrotic_peds.json`, `slot_dictionary.draft.json` |
+| 4 | 초안 수정: NCT07087314 I7에 7일 이내 검사·수혈/성장인자 조건, NCT06530004 E5에 약물성 심한 면역저하(또는), NCT06530004 I2를 기록 4가지(리툭시맙 투여·투여 전 재발·추적 결과·CD19 추적)로 정의, 스테로이드 절약제 2종 이상 동시 사용 환자는 합성 모집단에서 제외(전역 가정) | `data/cohort/llm_draft_nephrotic_peds.json` |
+| 5 | 생성 설정: `lab_age_days` 사전 분포(0~30일 균등, 가정) 추가, 정의가 바뀐 `other.complete_data` 제거 | `data/cohort/generator_config.json` |
+| 6 | 현황판: 묶인 조건의 슬롯을 모두 표시, 기간 조건이 있으면 "검사 N일 이내 필요 · 마지막 검사 M일 전 (새 결과지 필요)", 슬롯 한국어 이름 추가 | `web/static/cohort.js` |
+| 7 | 테스트 7개 추가(총 35개): 3값 논리, all/any 묶음, 묶음 코호트 검증, 지난 검사는 기간 조건 기준에서만 미확인, 생성 결과의 검사 시점 반영, 묶음의 '항상 같은 결과' 탐지, 사전에 없는 추가 슬롯 거부 | `tests/test_cohort_generator.py` |
+
+- 반영 후 생성 결과(시험 3개 시나리오): 실제 적격률 약 50%(검수 전 기준 39개 + 대기 3개는 아직 '충족'으로 간주), 확인 수단 4종.
+- 남은 일: 원문 대조만 하면 되는 초안 39개 검수, 대기 3개 결정.
+
+### 2026-11-01 — 합성 코호트 생성기: 비구조화 기준 52개 LLM 초안과 사람 검수 절차 (연구 · 오프라인 평가 전용)
+
+배경: 소아 신증후군 시험 3개의 기준 67개 중 자동 연결은 15개(나이·성별·검사 수치)뿐이라, 생성된 코호트의 적격률이 높고(60~90%) 확인 수단이 검사 결과지 하나로 몰렸습니다. 나머지 52개의 슬롯·진위 함수를 LLM(Claude)이 초안으로 만들고, 사람이 검수해야만 정답 계산에 들어가도록 절차를 붙였습니다. **초안은 `draft` 상태라 지금 생성되는 코호트의 정답에는 쓰이지 않습니다.**
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | **LLM 초안**: 52개 기준 → 범주형 슬롯 26개(진단 유형·스테로이드 반응·최근 면역억제제·감염·자가면역/면역결핍/종양·간염 표지자 등), 기준마다 판정 규칙과 판단 메모, 초안 사전 분포. 시험 사이 같은 정보는 같은 슬롯으로 묶음(예: 소변 단백 관해, 가족력, 최근 스테로이드 절약제). 작성자·날짜·검수 전 상태를 파일에 기록 | `data/cohort/llm_draft_nephrotic_peds.json` |
+| 2 | **원문을 바꿔 읽는 연결(`rule_override`)**: 혈소판 기준 `<100*10^12/L`을 10^9/L 오기로 보고 판정, Hb `>80 g/L`을 `>8.0 g/dL`로 환산, 파서가 구조화하지 않은 eGFR `<60`. engine 연결에서만 허용하고 바꿀 수 있는 키를 제한(field·operator·value·unit) | `src/ctrec/cohort/spec.py`, `truth.py` |
+| 3 | **범주형 검사 슬롯 지원**: `lab.hbv_status` 같은 범주형 슬롯은 규칙 엔진 입력(수치 검사값)에서 뺌 | `src/ctrec/cohort/truth.py` |
+| 4 | **초안 적용·검수 반영**: `apply-draft`(auto·reviewed·excluded는 바꾸지 않음, 연결마다 값별 시험 판정으로 계산 가능 여부와 '항상 같은 결과' 확인), `review-sheet`(엑셀용 CSV: 원문·번역·제안 슬롯·판정 규칙·메모·검수 칸), `apply-review`('확인'이고 시험 판정을 통과한 것만 reviewed, '제외'는 excluded, 나머지는 그대로), `preview-drafts`(초안이 모두 통과했다고 가정한 구조 통계, 저장 안 함) | `src/ctrec/cohort/slots.py`, `scripts/build_cohort_benchmark.py` |
+| 5 | 소스 카탈로그: 진료 요약이 진단명(`dx.*`)도 드러내고, 전화가 가족력(`cm.family_*`)도 드러내도록 | `data/cohort/source_catalog.json` |
+| 6 | 검수 시트(52행), 생성 설정에 초안 사전 분포 26개(모두 "가정 (LLM 초안, 검수 필요)") | `data/cohort/review_sheet_nephrotic_peds.csv`, `generator_config.json` |
+| 7 | 테스트 7개 추가(총 28개): 초안 적용·auto 보존, 계산 불가·항상 같은 결과 탐지, rule_override, 범주형 검사 슬롯, 검수 반영(확인·수정·제외·거절), 검수 시트, 저장소 초안이 실제 기준에 문제없이 들어가는지 | `tests/test_cohort_generator.py` |
+
+- 미리 보기(초안 전부 통과 가정): 적격률 0~20%, 숨긴 정보 중 후보 시험 2개 이상에 걸리는 비율 약 50%, 확인 수단 6종. 검수 전이므로 실험 결과로 쓰면 안 됩니다.
+- 검수에서 특히 볼 것: 원문을 바꿔 읽은 3개(혈소판 단위, Hb 환산과 7일·수혈 조건 생략, eGFR), '많아야 1종' 단순화 슬롯 2개(`med.steroid_sparing_recent`, `cm.immune_onc`), 해석이 갈리는 기준(NCT06125405 I7 오비누투주맙, E11 '신장 질환', NCT06530004 E5 '면역 결핍', I2 '완전한 자료'), 슬롯을 독립으로 샘플링해 생기는 비현실적 조합.
+
+### 2026-11-01 — 노벨티 후보 A용 합성 코호트 생성기 1단계 (연구 · 오프라인 평가 전용)
+
+배경: 노벨티 후보 A(연구 코디네이터의 제한된 시간 안에서 여러 환자 중 누구의 어떤 정보를 먼저 확인할지)를 사전 실험하려면, 환자마다 미확인 기준이 여러 개이고 한 정보가 여러 시험에 걸리는 코호트 데이터가 필요합니다. 기존 마스킹 데이터(`masked_labels.csv`)는 미확정 72쌍이 모두 서로 다른 환자에 있고 쌍마다 가려진 기준이 1개뿐이라 정책 간 차이가 생기지 않습니다. 그래서 실제 시험 기준 + 합성 환자로 코호트를 만드는 생성기를 추가했습니다. 후보 A 채택은 팀 회의에서 정하며, 이 코드는 주 실행 경로(`pipeline.py`, `web/`)를 바꾸지 않습니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | **스키마**: 슬롯 사전(기준 → 슬롯 → 진위 함수), 소스 카탈로그(확인 수단·드러나는 슬롯·비용 가정), 생성 설정(사전 분포·시나리오 knob), 코호트 산출물. 산출물은 정책이 읽는 `public`과 시뮬레이터만 읽는 `oracle`(숨긴 값·기준 정답·쌍 라벨)로 나뉨 | `src/ctrec/cohort/spec.py` |
+| 2 | **슬롯 사전 초안**: 구조화 기준(나이·성별·ECOG·검사 수치)만 자동 연결하고, 규칙 엔진이 실제로 판정할 수 있는지 시험 값으로 확인한 경우에만 `auto`. 단위 불일치(예: Hb g/L vs g/dL, 혈소판 10^12/L)와 비구조화 기준은 `needs_review`(사람 검수 대상). 다시 만들 때 `reviewed` 연결과 사람이 추가한 슬롯은 보존 | `src/ctrec/cohort/slots.py` |
+| 3 | **정답 계산**: 사실 우선. 슬롯 값을 먼저 샘플링하고 기준 정답은 기존 규칙 엔진(`tools/rule_engine.evaluate`) 또는 검수된 범주 함수로 계산 | `src/ctrec/cohort/truth.py` |
+| 4 | **생성**: 시드 고정(같은 설정 = 같은 결과), 환자당 후보 시험 수·비용 이질성·소스 묶음·시험 정원·범주별 결측률 knob, 영(null) 시나리오(환자당 시험 1개·균일 비용·묶음 없음·정원 제한 없음 강제), dev/test 분할, 설정 해시 | `src/ctrec/cohort/generate.py` |
+| 5 | **검증**: 정답 재계산 일치, 쌍 라벨 일치, 숨긴 슬롯 비노출, 영 시나리오 조건. 하나라도 실패하면 아무것도 쓰지 않음 | `src/ctrec/cohort/validate.py`, `scripts/build_cohort_benchmark.py` |
+| 6 | 데모 입력: 소아 신증후군 시험 3개(NCT06125405·NCT06530004·NCT07087314) 슬롯 사전 초안, 소스 카탈로그(비용은 모두 가정, Penberthy 2012·Dexheimer 2019로 규모만 참고), 시나리오 4종 | `data/cohort/*.json` |
+| 7 | **웹 코호트 현황판 `/cohort` (연구용·읽기 전용)**: 가장 최근 생성 세트에서 시나리오·반복 선택, 요약 타일(적격 확정·부적격 확정·미확정), 환자 × 시험 표(칸을 누르면 기준별 상태), 확인 수단(소스·비용·근거 수준). 기본은 정책이 보는 정보(public)만, '정답 보기'를 켜면 숨긴 값과 실제 라벨 표시. 상단에 합성 데이터·연구용 안내, 검수 전 기준 수 안내. 기존 환자 화면(`/`)에는 연결하지 않았음 | `web/static/cohort.html`·`cohort.js`·`cohort.css` |
+| 8 | 서버: `GET /cohort`, `GET /api/cohorts`(가장 최근 세트 목록), `GET /api/cohorts/{id}`(보고서에 있는 ID만, 경로 조작 불가). 기존 인증·보안 헤더·CSP 그대로 적용 | `web/app.py` |
+| 9 | 테스트 21개: 결정성, 분할, 정답(엔진·범주), 제외 기준 성립 → 부적격, 조작·누출 탐지, 비용·묶음 knob, 영 시나리오, 설정 오류, 웹 API(목록·단건·빈 세트·없는 ID) | `tests/test_cohort_generator.py` |
+
+- 실행: `PYTHONPATH=src python scripts/build_cohort_benchmark.py draft-slots --trials …` → `… generate`. 출력은 `data/cache/cohort/<설정 해시>/`(git 제외). LLM을 호출하지 않습니다. 화면: 웹 서버 실행 후 `/cohort`.
+- 화면 확인: 1280px(라이트)·390px(다크)에서 가로 넘침 0, 콘솔 오류 없음. 좁은 화면에서는 환자 열 고정을 풀고 표만 가로 스크롤.
+- **현재 한계**: 데모 시험 3개의 기준 67개 중 자동 연결은 15개뿐입니다(나이·성별·검사 수치). 나머지 52개는 검수 전이라 정답에서 빠지고 '충족으로 간주'되므로(`public.unbound_rules`에 기록), 생성된 적격률(60~90%)이 비현실적으로 높을 가능성이 크고 숨긴 정보가 모두 검사 결과지 하나로 드러납니다. 후보 A의 구조(여러 소스·여러 시험 공유)를 만들려면 비구조화 기준의 슬롯 사전 검수(설계안 M2)와 같은 질환의 시험 추가(M1)가 필요합니다.
+
+### 2026-10-25 — 통합 브랜치(`integration/midterm-1026`)로 이동, '정보 부족' 안내의 원문 중복 정리 (프론트엔드)
+
+배경: 백엔드 담당이 P14까지 통합한 `integration/midterm-1026`(ad3a222)을 기준 브랜치로 정했습니다. 이 브랜치에서는 판정할 수 없는 기준의 missing_info가 "확인 필요"처럼 일반 문구뿐이면, 서버가 화면에 보내는 사본에만 "이 기준을 확인할 정보 (원문): <기준 문장>"을 넣어 보냅니다. 그런데 상세 화면의 조건 행에는 이미 조건 이름과 "원문: …" 줄이 있어서 같은 영어 문장(최대 300자)이 한 행에 두 번 나왔습니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | **원문 중복 제거**: missing_info가 서버의 원문 기준 문장 사본이면 "필요: …" 대신 "판단할 정보가 입력에 없음 · 불충족 아님"만 표시. 원문은 아래 "원문:" 줄(또는 번역이 없으면 조건 이름)에 그대로 남음. 구체적인 missing_info는 지금처럼 "필요: …"로 표시 | `web/static/app.js` |
+| 2 | 상세 화면에 짧은 안내가 나오고 "필요: 확인 필요"와 원문 사본 문구가 없는지 브라우저 테스트로 확인 | `tests/test_web_browser.py` |
+
+- 로컬 정리: 이전 실행에서 검색 결과로 저장된 시험 파일을 `data/trials/`에서 `data/cache/ctgov/`(git 제외)로 옮겼습니다. 미추적 3개(NCT05889624·NCT06409832·NCT06972056)와 덮어써진 2개(NCT04063540·NCT07616128)의 바뀐 내용이며, 기존 파일 2개는 git 원본으로 되돌려 Frozen Store가 바뀌지 않게 했습니다.
+- 확인: 전체 회귀 테스트 1,726개 통과(건너뜀 5개), 브라우저 테스트 32개 통과. `main`과는 합치지 않았습니다.
+
 ### 2026-10-25 — 브라우저 테스트 18건 실패 정리, 글자 대비 개선, 질문 중 취소 버튼 복구 (프론트엔드)
 
 배경: 팀원이 백엔드 통합 중 브라우저 테스트(`CTREC_BROWSER_TESTS=1`) 18건 실패를 알려 왔습니다. 원인은 대부분 화면 개편(한 화면에 질문 하나, 결과 목록과 상세 화면 분리, 문구 변경)을 테스트가 따라가지 못한 것이었고, 실제 화면 문제 2개(질문 중 취소 버튼 사라짐, 글자 대비 부족)가 섞여 있었습니다. 역할 분담에 따라 프론트엔드 파일과 브라우저 테스트만 고쳤습니다.
