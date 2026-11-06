@@ -3,6 +3,16 @@
 > 2026-11-05 · 감사 기준: `integration/dcvc` `0b402c6` · 브랜치 `audit/wp6-experiment-readiness`
 > 범위: 분석·문서 작성만. 소스·테스트·데이터 변경 0, 외부 LLM·유료 API 호출 0, 실제 환자 데이터 사용 0.
 > 이 문서의 수치는 모두 오프라인 대역 실행이거나 저장소 문서에서 옮긴 값이며, 임상 성능이 아닙니다.
+>
+> **2026-11-07 갱신:** 아래 `결론`부터 §11까지는 2026-11-05 `0b402c6` 기준 기록으로 내용을 바꾸지 않고 보존합니다. 그 뒤 바뀐 상태는 §12에만 적습니다.
+
+## 현재 상태 요약 (2026-11-07, 상세는 §12)
+
+- **기준선과 `full_dcvc` 초안은 integration에 있습니다** (PR #16 병합). `full_dcvc`의 정의는 아직 합의 전입니다.
+- **실행기는 구현 PR이 있지만 통합되지 않았습니다.** `src/ctrec/sim/`은 열린 PR #20 (`aca2033`)에만 있고, integration `b2100d8`에는 없습니다.
+- **합성 입력의 정책 비교표는 PR #20 사본에서 재현됩니다.** 데모 코호트와 신증후군 예시 코호트만 해당합니다.
+- **실제 NSCLC 정책 비교는 여전히 실행할 수 없습니다.** 프로토콜 8개 중 6개만 파싱됐고, 슬롯 사전·생성 설정·환자 코호트·라벨이 없습니다.
+- **독립 GT가 없어 accuracy와 False Eligible은 여전히 산출할 수 없습니다.** 지금 나오는 수치는 합성 조건의 상대 비교입니다.
 
 ## 결론
 
@@ -56,6 +66,8 @@
 
 ### 0.4 현재 integration 결과와 미병합 기능
 
+> **2026-11-07 갱신:** 미병합으로 적힌 PR #3·#10과 생성기는 병합됐습니다. 현재 위치는 §12.1을 보세요. 이 절의 아래 내용은 2026-11-05 기록입니다.
+
 §2~§5의 실행 결과는 표에 따로 적은 브랜치 사본 실행을 빼면 모두 `0b402c6` 기준입니다.
 
 | 위치 | 기능 | 이 문서의 취급 |
@@ -102,6 +114,8 @@
 | 다환자 코호트 실행 | 구현만 확인 | `plan_cohort`는 테스트에서만 호출. `offline_records`는 환자 1명 `CohortState`만 만듦 |
 
 ### 1.2 정책·기준선·ablation
+
+> **2026-11-07 갱신:** 기준선과 `full_dcvc` 초안, 스위치 4종이 PR #16으로 들어왔습니다. §12.1, §12.6을 보세요. 이 절의 아래 내용은 2026-11-05 기록입니다.
 
 | 항목 | 상태 | 근거 |
 |---|---|---|
@@ -380,6 +394,8 @@ WP6 구현 전에 막아야 할 재현성 위험이 두 가지 있습니다.
 
 ### P0: 없으면 정책 비교 결과가 나오지 않음
 
+> **2026-11-07 갱신:** P0-1은 일부 해결, P0-5는 구현됨(정의 합의 대기)입니다. 7건의 현재 상태는 §12.9를 보세요. 이 절의 아래 내용은 2026-11-05 기록입니다.
+
 아래 7건은 §9에서 구현 작업 4개로 묶었습니다. 표의 범위 전체가 아니라 §9의 축소 범위부터 진행합니다.
 
 | # | 작업 | 완료 기준 |
@@ -468,6 +484,8 @@ $PY scripts/eval_question_fidelity.py --out $OUT/fidelity
 
 ## 9. 최소 실행 계획
 
+> **2026-11-07 갱신:** 작업 3은 일부 해결, 작업 2·4는 PR #20에 구현돼 병합 대기입니다. §12.9를 보세요. 이 절의 아래 내용은 2026-11-05 기록입니다.
+
 **목표**: 같은 합성 코호트·예산·seed에서 `full_dcvc`와 기준선을 돌려 재현 가능한 비교표를 만듭니다.
 
 **이 계획으로 주장할 수 있는 것**: 합성 조건에서의 정책 간 **상대 비교**(행동 수, 가정 비용, 시스템 확정 진척)와 재현성입니다. 임상 정확도, False Eligible, 실제 업무시간 절감은 이 계획으로 나오지 않습니다(§0.3).
@@ -522,6 +540,8 @@ $PY scripts/eval_question_fidelity.py --out $OUT/fidelity
 행동 비용의 실측·문헌값은 임상 진단이 아니라 **연구 코디네이터 업무 근거**가 필요한 항목입니다. 이것도 엔지니어가 임의로 정할 수 없습니다.
 
 ### 엔지니어링만으로 처리할 수 있는 항목
+
+> **2026-11-07 갱신:** 표의 PR #3·#10 병합, `random`·`cheapest_first` 구현은 끝났습니다. 남은 항목은 §12.9를 보세요. 이 절의 아래 내용은 2026-11-05 기록입니다.
 
 | 항목 | 해당 작업 |
 |---|---|
@@ -701,3 +721,248 @@ git archive origin/feat/wp5-item-level-failure | tar -x -C $DIR/item
    $PY scripts/build_cohort_benchmark.py generate --config data/cohort/generator_config.json --out $OUT/gen_$i
  done)   # 두 폴더의 파일 해시 비교. 연결·미연결 기준 수는 report.json의 bound_rules, unbound_rules
 ```
+
+---
+
+## 12. 11월 6일 이후 최신 상태 (2026-11-07)
+
+이 절은 앞선 기록을 대체하지 않고 그 뒤의 변화만 적습니다. 범위는 분석과 문서 작성이며, 외부 LLM·유료 API 호출과 실제 환자 데이터 사용은 0건입니다. 코드 실행은 저장소 밖에 푼 사본에서만 했습니다. 전체 pytest는 실행하지 않았습니다.
+
+**기준점 (2026-11-07 KST 조회, `git ls-remote`와 GitHub API)**
+
+| 대상 | 상태 | SHA |
+|---|---|---|
+| `integration/dcvc` | PR #11 병합까지 반영 | `b2100d8` |
+| PR #20 `feat/wp6-runner` | **열림, 미병합.** 커밋 3개, 충돌 없음(`clean`), GitHub 리뷰 0건, 코멘트 1건 | head `aca2033`, base `b2100d8` |
+| PR #16 `feat/engine-baselines` | 병합됨 (2026-11-06 05:30 UTC) | head `1f19a6f` |
+| PR #13 `audit/wp6-experiment-readiness` | 열림, 미병합 | head `59aecfe` |
+
+위치 표기는 세 가지입니다. **integration**은 `b2100d8`에 있음, **PR #20만**은 구현 PR은 있지만 통합되지 않음, **없음**은 어느 원격 브랜치에도 없음을 뜻합니다.
+
+### 12.1 구현 위치
+
+11-05 감사 뒤 PR #3, #5, #10, #11, #12, #14, #15, #16, #17, #18, #19가 병합됐습니다. 코호트 생성기는 PR #11로 들어왔습니다.
+
+| 항목 | 위치 | 상태 | 근거 |
+|---|---|---|---|
+| 기준선 `no_action`, `random`, `patient_order`, `cheapest_first` | integration | 구현 및 테스트 확인 | `engine/baselines.py`, `tests/test_engine_baselines.py` |
+| `legacy_greedy` | integration | 구현 및 테스트 확인 | `make_policy` 등록표 |
+| `full_dcvc` | integration | **초안** (`0.1-draft`). 정의 합의 전 | `engine/dcvc.py` |
+| 스위치 `dcv_impact`, `bundles`, `fairness_floor`, `recovery` | integration | 구현. 실험 연결은 §12.6 | `engine/dcvc.py` |
+| 환경 `CohortEnvironment` | PR #20만 | 구현 및 사본 테스트 확인 | `sim/environment.py` |
+| 응답 모델 `ResponseModel` | PR #20만 | 연락 불가, "모름", 지연만. 값은 전부 `assumed` | `sim/response_model.py` |
+| 평가기 `OfflineEvaluator` | PR #20만 | 규칙 엔진 범위. LLM 기준은 판정 불가 | `sim/evaluator.py` |
+| 판정기 `CategoricalJudge` | PR #20만 | 슬롯 연결 기준의 결정적 **상한**. 실제 LLM 오판 미반영 | `sim/judge.py` |
+| Runner, manifest, `result_hash` | PR #20만 | 구현 및 사본 테스트 확인. 사실 ID 결정화, salt는 코호트 해시에 포함 | `sim/runner.py`, `sim/cohort.py`, `sim/evaluator.py` |
+| 지표 (PairStatus, 규칙 GT, 능동·경과 시간 분리) | PR #20만 | 구현 및 사본 테스트 확인 | `sim/metrics.py` |
+| 생성기 → 시뮬레이터 변환 | PR #20만 | 신증후군 예시로 실행 확인. NSCLC 미실행 | `sim/from_generator.py` |
+| 실행 진입점 | PR #20만 | `python -m ctrec.sim`. 설계의 `scripts/run_cohort_experiment.py`는 없음 | `sim/__main__.py` |
+| 웹 엔진 경로의 정책 연결 | integration | `CTREC_POLICY_ID`로 같은 등록표 사용 | `web/engine_runner.py` |
+
+**PR #20의 현재 위치:** 구현 PR은 존재하지만 통합되지 않았습니다. 이 문서는 리뷰 결과를 앞서 판단하지 않으며, 코드가 바뀌면 §12.2의 수치를 다시 재야 합니다.
+
+### 12.2 재현한 수치
+
+모두 PR #20 `aca2033`을 저장소 밖에 풀어 실행한 값입니다. **합성 데이터, 가정 비용, 가정 응답 확률이며 정책 간 상대 비교 전용입니다** (`CLAIMS = synthetic_relative_comparison_only`, `sim/runner.py:40`).
+
+| 실행 | 결과 |
+|---|---|
+| `tests/test_sim_runner.py`, `tests/test_sim_generator.py`, `tests/test_engine_baselines.py` | 103 통과 |
+| 데모 비교표 (환자 6 × 시험 3, 18쌍, seed 1·2, 예산 4단계, 정책 6개) | 48행 모두 감사 `complete`, 규칙 GT 불일치 0 |
+| 생성기 예시 `neph-k3-catalog-source` (20 × 3, 60쌍, 예산 60·240분, seed 1) | 3개 정책 모두 확정 적격 0, 확정 부적격 0 |
+
+팀이 보고한 전체 테스트 수치는 다시 실행하지 않았습니다.
+
+| 커밋 | 보고 값 | 출처 |
+|---|---|---|
+| integration `b2100d8` | 2,348 passed / 5 skipped | PR #13 코멘트 (2026-11-06) |
+| PR #20 `aca2033` | 2,423 passed | PR #20 코멘트 (2026-11-06) |
+
+**데모 확정 수** (적격/부적격, seed 1 · seed 2, `--budgets 20,45,90,400 --seeds 1,2`)
+
+| 예산(분) | `no_action` | `random` | `patient_order` | `cheapest_first` | `legacy_greedy` | `full_dcvc` |
+|---|---|---|---|---|---|---|
+| 20 | 0/0 · 0/0 | 0/0 · 0/0 | 0/0 · 0/0 | 0/0 · 0/0 | 0/0 · 0/0 | 0/0 · 0/0 |
+| 45 | 0/0 · 0/0 | 0/1 · 0/0 | 0/1 · 0/1 | 0/0 · 0/0 | 0/0 · 0/0 | 0/0 · 0/0 |
+| 90 | 0/0 · 0/0 | 0/3 · 0/1 | 0/1 · 0/1 | 0/1 · 0/1 | 0/2 · 0/2 | 0/2 · 0/2 |
+| 400 | 0/0 · 0/0 | 5/6 · 5/6 | 5/6 · 5/6 | 5/6 · 5/6 | 5/6 · 5/6 | 5/6 · 5/6 |
+
+| 예산 400분의 코디네이터 분 | seed 1 | seed 2 | seed 3 |
+|---|---|---|---|
+| `full_dcvc` | 300.5 | 299.0 | 297.0 |
+| `random`, `patient_order`, `cheapest_first`, `legacy_greedy` | 307.5 | 306.0 | 303.0 |
+
+`no_action`을 뺀 5개 정책은 예산 400분에서 경과 시간도 seed별로 같습니다. seed 3의 확정 수는 5/5입니다.
+
+**바꿔 묻기 민감도** (seed 1~3, 예산 400분): seed 2에서만 2건 실행됐고 확정 수는 같으며 코디네이터 분은 16분 늘었습니다. PR #20 README와 일치합니다.
+
+**PR #20 README 1차 항목의 낡은 수치:** README의 `280.5/260 vs 286.5/281`, 확정 적격 `4~5`는 1차 커밋 `0e83336`에서는 재현되지만 현재 헤드의 값이 아닙니다. 현재 값은 `300.5/299.0 vs 307.5/306.0`, 확정 적격 5입니다. 인용할 때는 위 표를 씁니다.
+
+### 12.3 NSCLC 프로토콜과 실험 코호트
+
+| 항목 | 위치 | 상태 | 근거 |
+|---|---|---|---|
+| 프로토콜 | integration | 8개 수집, 선정표는 `검수 필요` | `data/nsclc/trials/` |
+| 파싱 | integration | 6개 성공, 160규칙 (시험별 11~36), 구조화 19 | `data/nsclc/parsed/` |
+| 파싱 실패 | integration | `NCT05255302`, `NCT04892953` (`TruncatedError`) | `docs/dev/wp2a_parse_pilot_NCT06928389.md` |
+| FROZEN 저장소 | 없음 | 파일 없음 | `data/nsclc/` |
+| 슬롯 후보 | integration | 196행, 55슬롯, **전부 `검수 필요`** | `data/nsclc/cohort/slot_candidates.csv` |
+| 슬롯 사전, 생성 설정 | 없음 | 모든 원격 브랜치에서 0건 | `git ls-tree` 전수 확인 |
+| 환자 코호트, 쌍 라벨 | 없음 | 0건 | 같은 확인 |
+| `source_map.json` | PR #20만 | **draft** (§12.3.1) | `data/nsclc/cohort/source_map.json` |
+
+**NSCLC 실제 실험 코호트는 연결되지 않았습니다.** 끊긴 지점은 셋입니다.
+
+1. 슬롯 사전과 생성 설정이 없어 코호트를 생성할 수 없습니다.
+2. `load_trials(store_dir=..., trials_dir=...)`로 호출하면 NSCLC 6개 시험(160규칙)은 적재됩니다. 그러나 CLI `--generator` 경로는 저장소 인자 없이 `data/parsed`를 읽으므로 `시험 저장소에 기준이 없음`으로 거부됩니다.
+3. FROZEN 저장소가 없어 `frozen_store_hash`가 고정된 데이터를 가리키지 않습니다.
+
+**이름 주의:** 데모 코호트 ID `sim-demo-nsclc-6x3`는 NSCLC 형태로 손수 만든 합성 입력입니다. 실제 프로토콜도 실제 환자도 아니므로 NSCLC 결과로 표기하지 않습니다.
+
+#### 12.3.1 `source_map` draft와 임상 검수
+
+- 파일의 `status`는 `draft`입니다. 테스트는 55슬롯을 정확히 덮는지와 정보원 ID가 카탈로그에 있는지만 확인합니다. **임상 타당성은 검증 범위가 아닙니다.**
+- 사실을 만들지 않는 슬롯은 3개입니다. `judge.life_expectancy`, `judge.investigator_unsuitable`은 담당의 판단이고, `lab.adequate_function`은 기준값이 없어 `unresolved`입니다.
+- 슬롯 하나가 검사 둘인 항목(AST/ALT, INR/aPTT, HBV/HCV)은 같은 값의 사실 둘로 둡니다. PR #20 README가 WP2b 검수 대상으로 적었습니다.
+- 값 표기 `"<슬롯>=<값>"`은 draft이며, 임상 표기로 바꾸는 일은 WP2b D1 검수 뒤입니다.
+- 임상 답변 기록은 여전히 없습니다. `docs/dev/wp2b_clinical_review_questions.md`는 질문지입니다.
+
+### 12.4 독립 GT, 규칙 GT, 생성기 라벨
+
+세 가지를 섞어 쓰면 안 됩니다. 아래 수치는 `neph-k3-catalog-source` replicate 0의 같은 60쌍입니다. 신증후군 예시이며 NSCLC가 아닙니다.
+
+| 구분 | 만드는 방법 | 값 | 표기 |
+|---|---|---|---|
+| **독립 GT** | 시스템과 분리된 임상 판단 | **없음** | accuracy, False Eligible의 전제 |
+| **규칙 GT** (`rule_gt_circular`) | 같은 평가기에 정답 사실 전체를 넣어 확정된 쌍만 라벨 | 적격 0, 부적격 17, 라벨 없음 43 | "규칙 GT 불일치". 구현 일관성 검사 |
+| 규칙 GT, `--include-draft` | 위와 같고 판정기에 검수 전 연결 포함 | 적격 0, 부적격 19, 라벨 없음 41 | 같음. manifest에 표시됨 |
+| **생성기 라벨** (`oracle.pair_label`) | 미연결 기준 42개를 `assume_pass`로 충족 간주 | 적격 31, 부적격 29 | 정답으로 쓰지 않음 |
+
+- 같은 쌍에서 적격이 31과 0으로 갈립니다. 생성기 라벨의 적격은 검수 전 기준을 충족으로 간주한 결과입니다.
+- PR #20은 `pair_label`과 `assume_pass`를 옮기지 않고 라벨 없음으로 둡니다 (`sim/from_generator.py:15`). PR #20 코멘트가 이 처리의 동의를 요청한 상태이며 합의되지 않았습니다.
+- 규칙 GT 불일치 0은 구현 일관성만 뜻합니다. 비교표 열 이름 `false_confirmed_eligible_vs_rule_gt`도 False Eligible로 옮겨 적지 않습니다.
+
+### 12.5 미구현·미완료
+
+| 항목 | 상태 | 근거와 영향 |
+|---|---|---|
+| `oracle_upper` | **미구현** | PR #20 `src`에 없음. 테스트는 엔진 등록표의 거부만 확인. 최적 대비 비율을 낼 수 없음 |
+| 부트스트랩 신뢰구간 | **미구현** | PR #20 `src`에 없음. 표는 seed별 점값뿐 |
+| 소규모 완전탐색 | 미구현 | 시뮬레이터 정확성 대조가 없음 |
+| 상충 해소 | **미완료** | 답변 사실을 철회하는 경로가 없음. 데모 `SYN-06`(기록 ECOG 1, 답변 3)은 seed 1, 400분에서 T-A·T-C가 `VERIFICATION_PENDING`으로 끝나고 규칙 GT는 적격. 판정기도 상충 슬롯을 판정 불가로 둠 |
+| 부분 응답 | **미완료** | 계약 `OutcomeStatus`에는 `partial`이 있으나 실행기 상태에 없음 (`sim/environment.py:30`, `sim/runner.py:43`) |
+| 환자 오답 | **미완료** | 환경은 정답 값만 돌려주고 응답 모델은 오답을 만들지 않음. 데모 `SYN-06`의 답변 3은 입력에 고정한 값 |
+| 웹의 바꿔 묻기 문구 | 미완료 | `question_bridge`가 REPHRASE 문구를 만들지 않아 웹에서는 끈 채로 둠 (PR #20 README) |
+
+부분 응답과 오답이 없으므로 현재 결과는 **응답이 오면 값이 맞다는 가정** 위에 있습니다. 환자 자기 보고 오류의 비용은 평가에 들어가지 않습니다.
+
+### 12.6 기본 정책과 `full_dcvc` 비교의 한계
+
+**현재 결과로 `full_dcvc`가 낫다고 말할 수 없습니다.**
+
+| 한계 | 관찰 |
+|---|---|
+| 정의 미합의 | `full_dcvc`는 `0.1-draft`. 식과 기본값이 바뀔 수 있어 수치가 초안에 묶임 |
+| 후보가 같음 | 모든 정책이 같은 후보(`propose`)를 쓰고 선택 순서만 다름 |
+| 큰 예산에서 차이 없음 | 400분에서 확정 수가 같고, `full_dcvc`는 6~7분(약 2%) 적음. 이 분도 가정 비용 |
+| 작은 예산에서 우위 없음 | 45분에서 `full_dcvc`는 확정 0이고 `patient_order`는 1. 90분에서 `legacy_greedy`와 행동·분·확정이 같고, seed 1의 `random`은 3으로 더 많음 |
+| 작은 표본 | 18쌍, seed 2~3개, 신뢰구간 없음 |
+| 상한 없음 | `oracle_upper`가 없어 `no_action`이라는 하한만 있음 |
+| 평가 범위 | 데모는 규칙 엔진 범위. 판정기가 있는 생성기 예시는 모든 정책이 확정 0이라 비교가 되지 않음 |
+| 가정값 | 비용과 응답 확률이 전부 가정. 바꿔 묻기 0.1은 근거 없음 |
+| ablation 연결 | `spec.ablations`는 저장만 하고 읽는 코드가 없음. 스위치는 `compare(policy_configs=)`로만 넘기며 CLI 옵션이 없음. 설계의 `-partial_reeval`, `-evidence_level`은 없음 |
+
+**정보원 실패의 시험 단위 소진 (PR #20 리뷰 항목):** 정보원 실패가 실패한 행동의 항목만 보고 시험 전체를 소진 처리합니다. 항목 단위로 바꾼 가상 패치를 메모리에서만 적용해 비교했습니다 (데모, seed 0~39, 720쌍, 코디네이터 300분, 임상의 100분, 12단계). 측정용이며 제안된 수정안이 아닙니다.
+
+| 정책 | 상태가 바뀌는 쌍 | `BLOCKED_FAILURE` 현재 → 가상 | 확정 부적격 현재 → 가상 | 확정 적격 |
+|---|---|---|---|---|
+| `legacy_greedy` | 51 / 720 | 130 → 79 | 226 → 226 | 175 |
+| `full_dcvc` | 53 / 720 | 134 → 81 | 223 → 226 | 177 |
+
+두 정책의 확정 부적격 차이(226 vs 223)가 이 패치에서 사라집니다. 이 동작이 정리되기 전의 정책 차이는 구현 영향과 분리되지 않으므로, 소진 규칙을 고치면 비교표를 다시 내야 합니다.
+
+### 12.7 WP6 평가에 직접 영향을 주는 근거 수준 문제
+
+P0 통합 계획은 별도 작업이므로 여기에 적지 않습니다. WP6 수치의 뜻을 바꾸는 사항만 적습니다. §2.2 D에서 예고한 위험이 PR #20 경로에서 실제로 발생합니다.
+
+| 문제 | 확인 | WP6 영향 |
+|---|---|---|
+| **선언된 기록이 문서 검증 없이 확정됨** | 평가기가 `input_source="clinical_record"`를 고정하고 (`sim/evaluator.py:185`), 변환 기본값은 `public_verified=False` (`sim/from_generator.py:115`). 데모 시험 T-A에 같은 값을 넣으면 `clinical_record` 미검증 → `CONFIRMED_ELIGIBLE`, 문서 검증 → `CONFIRMED_ELIGIBLE`, `self_report` → `VERIFICATION_PENDING`. T-A의 검사 기준은 `clinical_record` 필요 기준임 | 생성 코호트의 공개 사실은 검사 수치도 이 경로를 탐. 문서 확인을 건너뛰고 확정되므로 확정 수와 비용이 달라짐 |
+| **확정 적격이 전부 문서 검증은 아님** | 데모 400분, 5개 정책 × seed 3개의 확정 적격 75쌍 모두 기준 항목에 `document_verified`가 아닌 사실이 포함됨. 나이·ECOG처럼 기록 필수가 아닌 기준의 사실임 | 시스템 규칙 통과이며 규칙 위반은 아님. 표기는 계속 "시스템 확정 적격" |
+| **적격과 부적격의 증거 기준이 다름** | Confirmed Ineligible은 `document_verified`를 요구하고 Confirmed Eligible 경로는 선언만 봄 (§2.2 D) | 두 방향의 확정 비용이 비대칭이라 정책 비교에 섞임 |
+| **규칙 GT는 전부 문서 검증 상태로 계산** | `rule_labels`가 정답 사실을 모두 검증된 기록으로 넣음 | 근거가 약한 확정을 규칙 GT 비교로는 잡지 못함 |
+| **P0 수정 미통합** | 확인한 P0 브랜치는 원격에 없음 | 통합 뒤 데모 수치에 미치는 영향은 측정하지 않았음. 통합 뒤 §12.2를 다시 잼 |
+
+`public_verified` 값은 사실의 `verified`로 `cohort_hash`에 반영되지만 manifest에 별도 항목은 없습니다. 실험 전에 값을 정하고 결과에 함께 적어야 합니다.
+
+### 12.8 합성 데모 결과와 실제 임상 성과의 구분
+
+| 구분 | 쓸 수 있는 표현 | 쓸 수 없는 표현 |
+|---|---|---|
+| 인프라 | "PR #20 사본에서 같은 입력의 비교표가 재현됨" | "통합 완료", "병합본 기준" (병합 전) |
+| 정책 비교 | "합성 데모에서 예산별 확정 수를 비교함. 상대 비교이며 우열 결론 없음" | "`full_dcvc`가 더 효율적", "2% 절감" |
+| 안전 | "합성 조건의 규칙 GT 불일치 0, 구현 일관성 검사" | "False Eligible 0", "거짓 적격 없음" |
+| 정확도 | 해당 없음 | accuracy, 임상 정확도, NSCLC 매칭 성능 |
+| 시간 | "가정 비용의 상대 차이" | 실제 코디네이터 업무시간 절감 |
+| 데이터 | "NSCLC 프로토콜 8개 수집, 6개 파싱, 검수 전" | "NSCLC 환자 코호트로 검증" |
+
+§4의 인프라 수치와 §5의 금지 목록은 그대로 유효합니다. §5의 "정책 우열" 금지도 유지하되, 이유는 "비교 실행이 없음"에서 "합성 비교만 있고 결론을 낼 수 없음"으로 바뀌었습니다.
+
+### 12.9 이전 절과 PR #13 코멘트 요청의 대응
+
+PR #13 코멘트(2026-11-06)가 갱신을 요청한 항목을 포함합니다. 기록을 보존하려고 해당 절 본문을 고치지 않고, 이 표와 절 첫머리의 안내로 반영했습니다.
+
+| 이전 절 | 11-05 기록 | 현재 |
+|---|---|---|
+| §0.4, 감사 기준선 | `0b402c6`, 2,082 통과 | `b2100d8`, 2,348 통과 / 5 건너뜀 (팀 보고, 미재실행) |
+| §1.2 | 기준선·`full_dcvc` 설계만 | integration에 구현. `full_dcvc`는 초안. `oracle_upper`는 미구현 |
+| §2.2 A | 정책 비교 불가 | 합성 입력은 PR #20에서만 가능. NSCLC는 불가 |
+| §3 재현 위험 2건 | `result_hash`, salt | PR #20이 결정적 사실 ID와 코호트 salt로 처리. 같은 spec 해시 일치 테스트 통과 (사본) |
+| §6 P0-1 실험 이름 | 합의 필요 | 일부 해결. 스위치는 생겼고 `full_dcvc` 정의 합의와 설계 §5 반영이 남음 |
+| §6 P0-2 GT 정책 | 결정 필요 | **미해결.** 독립 GT 없음 |
+| §6 P0-3 생성기·NSCLC | 필요 | 생성기 병합, `source_map`은 PR #20 draft, 슬롯 사전·생성 설정 없음 |
+| §6 P0-4 `sim/` | 필요 | PR #20만 |
+| §6 P0-5 기준선·`full_dcvc` | 필요 | 구현됨. 정의 합의 대기 |
+| §6 P0-6 `no_answer` | PR #10 병합 필요 | 병합됨. 바꿔 묻기는 PR #20만. 소진 규칙은 §12.6 항목이 열려 있음 |
+| §6 P0-7 지표 | 필요 | 시뮬레이터 지표는 PR #20만. `eval/evaluate.py`는 여전히 `confirmed`를 넘기지 않음 |
+| §6 P1-3 역전 지표 | PR #3 병합 필요 | 병합됨. 시뮬레이터 비교표에는 역전 열이 없음 |
+| §9-1 코호트 | 착수 전 | 생성기 연결은 PR #20만. NSCLC 입력 없음 |
+| §9-2 Runner | 착수 전 | PR #20만 |
+| §9-3 baseline | 착수 전 | 일부 해결 (§12.1) |
+| §9-4 지표 | 착수 전 | PR #20만 |
+| §10 엔지니어링 표 | PR #3·#10 병합, `random`·`cheapest_first` 구현 등 | 끝남. 남은 것은 PR #20 병합, ablation 연결, `oracle_upper`, 부트스트랩, 부분 응답·오답 모델, 상충 경로 |
+
+### 12.10 실험 준비에 필요한 입력
+
+NSCLC 비교를 시작하기 전에 필요한 항목입니다. 1~4번이 없으면 코호트를 만들 수 없습니다.
+
+| # | 요청 | 막는 것 |
+|---|---|---|
+| 1 | NSCLC 슬롯 사전과 생성 설정 작성 | 코호트 생성 |
+| 2 | `source_map.json` 55슬롯 검토, `lab.adequate_function` 처리 결정 | 사실 변환 |
+| 3 | `assume_pass`를 옮기지 않는 처리(Q-G3)에 동의 여부 회신 | 라벨 정책 |
+| 4 | 파싱 6개로 시작할지, 실패 2개를 재파싱할지 결정 (유료 재파싱은 별도 승인), FROZEN 해시 고정 | 저장소 고정 |
+| 5 | `public_verified` 값 결정 (§12.7) | 확정의 뜻 |
+| 6 | `slot_candidates.csv` 196행 임상 검수 경로 확정. 불가능하면 구조 벤치마크로 범위 축소 결정 | 독립 GT, 임상 주장 |
+| 7 | 바꿔 묻기 0.1과 응답 모델 값의 참고 자료 | 가정값 근거 |
+
+CLI가 NSCLC 저장소 경로를 받도록 하는 변경은 PR #20 또는 후속 PR의 구현 작업입니다 (§12.3의 2번).
+
+### 12.11 재현 명령
+
+Git Bash 기준입니다. 저장소 밖에 풀어서 실행하므로 worktree를 건드리지 않으며, 실제 LLM을 호출하지 않습니다.
+
+```bash
+git fetch origin
+mkdir -p $DIR/pr20 && git archive aca2033 | tar -x -C $DIR/pr20
+cd $DIR/pr20
+export PYTHONPATH=$DIR/pr20/src PYTHONUTF8=1 ANTHROPIC_API_KEY=
+
+$PY -m pytest -q -p no:cacheprovider tests/test_sim_runner.py tests/test_sim_generator.py tests/test_engine_baselines.py
+$PY -m ctrec.sim --budgets 20,45,90,400 --seeds 1,2
+$PY -m ctrec.sim --budgets 400 --seeds 1,2,3 --rephrase both
+$PY -m ctrec.sim --generator data/cohort/generator_config.json --scenario neph-k3-catalog-source \
+    --budgets 60,240 --seeds 1 --policies random,legacy_greedy,full_dcvc
+```
+
+§12.4의 라벨 수, §12.6의 가상 패치, §12.7의 근거 측정은 `generate_cohort`, `runner.rule_labels`, `runner.run`을 부르는 임시 스크립트로 냈으며 저장소에 넣지 않았습니다.
