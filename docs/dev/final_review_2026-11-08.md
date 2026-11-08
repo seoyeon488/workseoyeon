@@ -3,6 +3,15 @@
 작성: 서연 · 기준: 선우 통합본 `urgent/integration` `8afe5ea` (2026-11-08 20:50) · 검수 범위: 읽기 + 허용된 확인 실행(P0 채점, 데모 A~D 재확인)
 > **데이터 검증 완료 / 임상 검수 미완료.** GT는 축소 범위 규칙 GT (임상 전문가 미검수). 정확도·성능 향상 표현을 쓰지 않습니다. 실험(정책 비교·ablation)은 다시 돌리지 않았고, 코드·GT 라벨·데이터는 바꾸지 않았습니다.
 
+## 발표 수치 고정 요약 (24시, 원자료 대조 → 10절)
+
+| 항목 | 결과 |
+|---|---|
+| 원자료 불일치 | **0건 / 대조 21항목.** 슬라이드 6 ablation 값은 result.json 243개(실행 환경 commit 전부 `dba06d9`)·`wp6_eval_*.json` 재집계와 모두 같음 |
+| 최종 표기 규칙 | 슬라이드 5 = "`dba06d9` 기준 · `8afe5ea` 동일 결과 확인" + 노트 "`b1d2a7f`에서도 동일" / 슬라이드 5-1 = "`8afe5ea` 기준 · `b1d2a7f` 동일" (dba06d9 채점 없음, 규칙 예외) / 슬라이드 6 = "11/08 dba06d9 기준 · 최종 통합본 실험 결과 아님" / 슬라이드 1~4(데이터) = 평가셋 생성 `996efd6`, 실행 결과가 아니라 규칙 대상 밖 |
+| E2E | 추정 → 확정: `d20cc0d`, SYN-04 × T-C, 3/11 → 4/10, 안전 위반 0 (선우 확인) |
+| 변경 위치 | `presentation_data_gt.md` 머리말·슬라이드 5·5-1·6·바뀐 점 표 / `demo_final_flow.md` 4·5절 / 이 문서 8-0·8-4·10절, 원자료 문구 4곳 |
+
 ## 최종 통합 브랜치 대조 요약 (23시, `integration/phase1-final` `b1d2a7f` → 9절)
 
 | 항목 | 결과 |
@@ -19,7 +28,7 @@
 | 불일치 | 30개 항목 중 **불일치 5 / 코호트 다름 12** / 일치 13. 모두 내 문서의 `3e4b2fd`·`4f81460` 값이고, `8afe5ea`(240쌍) 또는 `dba06d9`(ablation) 값으로 고침 |
 | 400분 47 vs 48 | **엔진 버전 차이.** `4f81460` 엔진 48 → `dba06d9`·`8afe5ea` 47 (result_hash 같음, 재현 안정). 갈린 쌍 P034 × NCT07416058, 원인 후보 `39ec3d2`. 발표는 `8afe5ea` 47, 48은 노트 |
 | 데모 영향 | **없음** (메인 W1, 보조 A·B). E2E "확정 부적격 4 / 미확정 10"은 보고서·통합본에서 못 찾음 → 선우 확인 필요 (정황상 `d20cc0d`). 백업 E2E 표 숫자만 리허설 때 다시 확인 |
-| 표기 | ablation 수치는 모두 "11/08 dba06d9 기준, 최종 통합본 실험 결과 아님". 원자료는 선우 로컬이라 GitHub에 없음 |
+| 표기 | ablation 수치는 모두 "11/08 dba06d9 기준, 최종 통합본 실험 결과 아님". 원자료 대조 완료 (24시, 10절) |
 
 아래 요약·0~7절은 21시 검수 내용이며, 바뀐 수치는 그 자리에서 고쳤습니다.
 
@@ -34,7 +43,7 @@
 | known_defect | **충돌 있음.** 선우 `5fa4e24`로 P0-3이 고쳐져 strict xfail 2건이 XPASS로 실패. 해제 패치(2줄) 제안 → 적용 시 13 passed |
 | P0 127건 (합성 사례·오프라인 스텁 기준) | 오채택 36 → 22, 상충 탐지 10/27 → 15/27, 과잉 보류 4 → 4. 나빠진 사례 0 |
 | 확정 데모 흐름 | 웹 W1(DEMO-NSCLC-1, 묶음 요청 → 서류 확인 → 의사 판단) 메인 + 오프라인 A(P052 EXPERT_REVIEW)·B(P045 기록 확인 후 부적격) 보조. D는 한계 설명용, C는 질문 대비용 |
-| 위치 미확인 | ① (22시 해소) DCV+C·ablation 재실험은 선우 `dba06d9` 03·04 보고서, 원자료 없음 ② W1~W3 번호가 붙은 문서 |
+| 위치 미확인 | ① (22시 해소) DCV+C·ablation 재실험은 선우 `dba06d9` 03·04 보고서, 원자료는 24시 `share/seoyeon-experiment-raw-dba06d9` `ce4a8e1` `docs/experiments/seoyeon-handoff-dba06d9/raw/sy_b/` (10절) ② W1~W3 번호가 붙은 문서 |
 
 ## 0. 위치 파악
 
@@ -267,7 +276,7 @@ NSCLC 파일럿 (`sim-nsclc-pilot-8x6`, 48쌍, 작성자 판독 부적격 라벨
 ## 8. 추가 대조 — 선우 dba06d9 재실험 보고서 (11/08 21:46 공유)
 
 입력: `share/seoyeon-experiment-reports-dba06d9` `9807a22` (2026-11-08 21:46) — `docs/experiments/seoyeon-handoff-dba06d9/03_LATEST_EXPERIMENT_RESULTS.md`, `04_DCV_ABLATION_ANALYSIS.md`. 측정 커밋 `dba06d9` (2026-11-08 16:35, PR #53 head).
-**원자료 없음:** 보고서가 가리키는 결과 폴더(`$S/e1_*.json`, `$S/wp6_eval_*.json`, probe)는 선우 로컬 scratchpad라 GitHub에 없습니다. 보고서 표의 값만 대조했습니다.
+**원자료:** 22시에는 원자료가 없어 보고서 표만 대조했습니다. 24시에 원자료 `share/seoyeon-experiment-raw-dba06d9` `ce4a8e1` `docs/experiments/seoyeon-handoff-dba06d9/raw/sy_b/`가 공유되어 재집계로 대조를 끝냈습니다(10절, 불일치 0).
 **표기:** 이 절과 발표 자료의 ablation 수치는 모두 **11/08 dba06d9 기준, 최종 통합본 실험 결과 아님**입니다.
 
 ### 8-0. 요약
@@ -278,7 +287,7 @@ NSCLC 파일럿 (`sim-nsclc-pilot-8x6`, 48쌍, 작성자 판독 부적격 라벨
 | 400분 47 vs 48 | **엔진 버전 차이.** `4f81460` 엔진 48, `dba06d9`·`8afe5ea` 47 (result_hash 같음 → 재현 안정). 갈린 쌍 P034 × NCT07416058. 집계 방식 차이 아님 (내 채점과 선우 채점 모두 47) |
 | 발표 사용 값 | 최종 통합본 `8afe5ea` 47. 48은 노트 |
 | DCV·번들링 | `3e4b2fd` 값 삭제, `dba06d9` 값으로 교체. 코호트별 표 분리 |
-| E2E 변경 | 보고서 03·04에 해당 언급 없음, 통합본에도 "확정 부적격 4 / 미확정 10" 기록 없음 → **선우 확인 필요**. 정황상 `d20cc0d`. 데모 메인 흐름 영향 없음, 백업 표 숫자만 다시 확인 필요 |
+| E2E 변경 | (24시 확정) `d20cc0d`·SYN-04 × T-C, 3 / 11 → 4 / 10, 안전 위반 0 (선우 확인). 데모 메인 흐름 영향 없음 |
 | 발표 사용 금지 문장 | 선우 보고서 9건 (8-5) |
 
 ### 8-1. 수치 대조
@@ -307,7 +316,7 @@ NSCLC 파일럿 (`sim-nsclc-pilot-8x6`, 48쌍, 작성자 판독 부적격 라벨
 | 20 | final_review 2-1 평가셋 ablation | (없음) | 400분 47/47/51, 6000분 124/124/124 | – / dba06d9 | 240쌍 | 추가 |
 | 21 | final_review 2-2 #7 "200분 dcvc 7.5 vs 0~1" | 7.5 vs 0~1 | 4±4.34 vs random 0.33, patient_ind 0.83 | 3e4b2fd / dba06d9 | 생성기 | **코호트 다름** → 갱신, 발표 사용 금지 유지 |
 | 22 | final_review 요약 "구간 추정 없음" | 구간 없음 | 평균±표준편차만, 구간 없음 | – | 전체 | 일치 |
-| 23 | final_review 0 "재실행 결과 위치 미확인" | 위치 미확인 | 03·04 보고서 (원자료 없음) | – | – | **불일치** → 위치 확인, 원자료 없음 |
+| 23 | final_review 0 "재실행 결과 위치 미확인" | 위치 미확인 | 03·04 보고서 + 원자료 (24시) | – | – | **불일치** → 위치 확인, 원자료 없음 |
 | 24 | demo_final_flow 보조 1 "20/23, 한 번 실행" | 20/23 | 20/23 (seed 1) | 8afe5ea / dba06d9 | 240쌍 | 일치 |
 | 25 | demo_final_flow 보조 2 "거짓 확정 0" | 0 | 0 | 같음 | 240쌍 | 일치 |
 | 26 | demo_final_flow "생성기 800분 역전" | 역전 (값 없음) | 8 vs 5 | 3e4b2fd / dba06d9 | 생성기 | **코호트 다름** → 기준 커밋 표기 추가 |
@@ -353,14 +362,14 @@ NSCLC 파일럿 (`sim-nsclc-pilot-8x6`, 48쌍, 작성자 판독 부적격 라벨
   - 240쌍 평가셋 (seed 1): 400분 47 / 47 / 51, 6000분 124 / 124 / 124 (판단 대기 도달 모두 20)
 - 반영 위치: `presentation_data_gt.md` 슬라이드 6·7, 이 문서 2-1·2-2 #7·6절 S4, `demo_final_flow.md` "말하지 않을 것"
 
-### 8-4. E2E 변경 확인
+### 8-4. E2E 변경 확인 (24시 확정)
 
-- 찾은 것: 03·04 보고서에는 E2E 언급이 없습니다. 통합본 `README.md` 자동 실행 기록은 #49 (`7c282b2`) offline 참여 불가 확정 3 / 미확정 14, #50 (`5c93e3d`) 뒤 참여 가능 확정 1 → 4 · 남은 미확정 11쌍입니다. "확정 부적격 4 / 미확정 10"은 어디에도 없습니다.
-- 정황: #50 기록의 미확정 11쌍 중 1쌍(SYN-04 T-C, 80세 '75세 이하' 불충족인데 나이 근거 요청이 닫혀 보류)이 바로 `d20cc0d` (fix/exclusion-basis-kept, 20:43, 통합본 `667eacd`로 병합)가 고친 문제입니다. 이 1쌍이 확정되면 참여 불가 확정 3 → 4, 미확정 11 → 10이 되어 언급과 맞습니다. E2E를 직접 돌리지 않아 확인하지 못했습니다 → **선우 확인 필요**.
+- **확정 (선우 확인, 2026-11-08):** 오프라인 E2E가 참여 불가 확정 3 / 미확정 11 → **4 / 10**으로 바뀐 원인은 `d20cc0d` (fix/exclusion-basis-kept, PR #56)입니다. 대상은 **SYN-04 × T-C** 1쌍(80세, '75세 이하' 불충족)입니다. 나이 근거 확인 요청이 다른 서류 확인 뒤에도 닫히지 않아, 의무기록으로 나이를 확인한 뒤 확정 부적격(정답과 같음)이 됩니다. 안전 위반 0입니다.
+- 최종 통합본 `b1d2a7f` 기대값: 참여 가능 확정 정답과 일치 4 + 의사 판단 뒤 6 / **참여 불가 확정 4 / 미확정 10** / 안전 위반 0 (README §3.0, phase1-final 3회 실행 동일). 이전 22시 판의 "추정·선우 확인 필요"는 해소했습니다. 이번에도 E2E를 직접 돌리지는 않았습니다(선우 실행 기록 기준).
 - 데모 영향
-  - 메인 W1·보조 A·B: 영향 없음 (W1은 문서 확인·의사 판단 경로, A·B는 오프라인 runner이고 `d20cc0d`는 followup 서비스 쪽)
-  - W3 (S003 7세, 나이 근거 요청 유지): `d20cc0d`가 바로 이 흐름을 고친 커밋이고, 동겸의 W3 기록이 수정 뒤 기록이라 기대 상태 그대로
-  - 백업 "`run_e2e_synthetic.py --mode offline` 결과 표": README의 숫자(3·14 또는 4·11)를 그대로 쓰면 안 됨. 리허설 때 통합본에서 다시 돌린 값으로 표를 만들어야 함
+  - 메인 W1·보조 A·B: 영향 없음 (W1은 문서 확인·의사 판단 경로, A·B는 오프라인 runner)
+  - W3 (S003 7세, 나이 근거 요청 유지): `d20cc0d`가 고친 흐름과 같은 종류이고, 동겸 기록이 수정 뒤 기록이라 기대 상태 그대로
+  - 백업 E2E 표: **최종 통합본 `b1d2a7f` 오프라인 E2E · 확정 부적격 4 / 미확정 10** 값으로 고정
 
 ### 8-5. 선우 보고서 — 발표 사용 금지 문장
 
@@ -401,6 +410,7 @@ NSCLC 파일럿 (`sim-nsclc-pilot-8x6`, 48쌍, 작성자 판독 부적격 라벨
 | 내 `final_review_2026-11-08.md`, `final_review_evidence/`, `final_review_scripts/` | **누락** | |
 | `demo_nsclc_scenarios.md` | 선우 갱신본으로 대체 (`fa07b65`·`3eecd50`, B=P052, C=P058). 내 21시판(`eba0fc6`)은 들어가지 않음 — 통합본 판이 더 정확해 그대로 두는 것 권장 | |
 | `docs/dev/final_review_evidence/phase1_final_runs.json`, `final_review_scripts/run_one_policy.py` | 23시: phase1-final runner 3개·테스트·재생성 결과 |
+| `docs/dev/final_review_evidence/reagg_dba06d9.json`, `final_review_scripts/reagg_dba06d9_raw.py` | 24시: 선우 원자료 재집계 |
 | `docs/proposals/p0_3_xfail_release.patch` | 누락 (불필요: `60d7921`로 반영됨) | |
 
 ### 9-2. 수치 재확인
@@ -440,6 +450,40 @@ NSCLC 파일럿 (`sim-nsclc-pilot-8x6`, 48쌍, 작성자 판독 부적격 라벨
 - phase1-final에는 PR #54(질문 고르기 화면), #55(보류 표시), `73ca6e5`(진행 중 요청 수), F-03(`e8ac1e5`, 의사 판단에 `expected_revision` 필수 — 화면이 이를 보내는지 확인)가 들어갔는데 README 9.1 기준 브라우저 화면은 아무도 열지 않음 → W1을 phase1-final에서 한 번 돌리고 녹화.
 - 백업 E2E 기대값: 참여 가능 확정 4 + 의사 판단 뒤 6 / 참여 불가 확정 4 / 미확정 10 / 안전 위반 0.
 - 오프라인 보조는 통합본 문서 이름 그대로 A(P052 × NCT07680790), B(P052 × NCT06928389). C는 "확보했다"고 말하지 않음.
+
+## 10. 원자료 대조 — 슬라이드 6 ablation (24시)
+
+입력: `share/seoyeon-experiment-raw-dba06d9` `ce4a8e1` `docs/experiments/seoyeon-handoff-dba06d9/raw/sy_b/` (선우, 2026-11-08 22:06). 실험은 다시 돌리지 않고 `row` 값만 다시 셌습니다 (`docs/dev/final_review_scripts/reagg_dba06d9_raw.py`, 결과 `docs/dev/final_review_evidence/reagg_dba06d9.json`). 모두 **11/08 dba06d9 기준 · 최종 통합본 실험 결과 아님**.
+
+| 수치 | 문서 값 | 원자료 재집계 | 일치 | result.json 경로 (`raw/sy_b/` 아래) |
+|---|---|---|---|---|
+| 파일럿 30분 dcvc 확정 부적격 | 6 | 6 (n=5) | 일치 | `e1_nsclc_out/c*-dcvc-b30-s*/result.json` |
+| 파일럿 30분 dcvc-no_dcv 확정 부적격 | 6 | 6 (n=5) | 일치 | `e1_nsclc_out/c*-dcvc-no_dcv-b30-s*/result.json` |
+| 파일럿 30분 dcvc-no_bundles 확정 부적격 | 2 | 2 (n=5) | 일치 | `e1_nsclc_out/c*-dcvc-no_bundles-b30-s*/result.json` |
+| 파일럿 90분 dcvc 확정 부적격 | 8 | 8 (n=5) | 일치 | `e1_nsclc_out/c*-dcvc-b90-s*/result.json` |
+| 파일럿 90분 dcvc-no_dcv 확정 부적격 | 8 | 8 (n=5) | 일치 | `e1_nsclc_out/c*-dcvc-no_dcv-b90-s*/result.json` |
+| 파일럿 90분 dcvc-no_bundles 확정 부적격 | 4 | 4 (n=5) | 일치 | `e1_nsclc_out/c*-dcvc-no_bundles-b90-s*/result.json` |
+| 파일럿 400분 dcvc 확정 부적격 | 8 | 8 (n=5) | 일치 | `e1_nsclc_out/c*-dcvc-b400-s*/result.json` |
+| 파일럿 400분 dcvc-no_dcv 확정 부적격 | 8 | 8 (n=5) | 일치 | `e1_nsclc_out/c*-dcvc-no_dcv-b400-s*/result.json` |
+| 파일럿 400분 dcvc-no_bundles 확정 부적격 | 14 | 14 (n=5) | 일치 | `e1_nsclc_out/c*-dcvc-no_bundles-b400-s*/result.json` |
+| 생성기 200분 dcvc 확정 부적격 | 4±4.34 | 4±4.34 (n=6) | 일치 | `e1_gen_out/c*-dcvc-b200-s*/result.json` |
+| 생성기 200분 dcvc-no_dcv 확정 부적격 | 4±4.34 | 4±4.34 (n=6) | 일치 | `e1_gen_out/c*-dcvc-no_dcv-b200-s*/result.json` |
+| 생성기 200분 dcvc-no_bundles 확정 부적격 | 3.33±3.33 | 3.33±3.33 (n=6) | 일치 | `e1_gen_out/c*-dcvc-no_bundles-b200-s*/result.json` |
+| 생성기 800분 dcvc 확정 부적격 | 5±5.87 | 5±5.87 (n=6) | 일치 | `e1_gen_out/c*-dcvc-b800-s*/result.json` |
+| 생성기 800분 dcvc-no_dcv 확정 부적격 | 5±5.87 | 5±5.87 (n=6) | 일치 | `e1_gen_out/c*-dcvc-no_dcv-b800-s*/result.json` |
+| 생성기 800분 dcvc-no_bundles 확정 부적격 | 8±3.69 | 8±3.69 (n=6) | 일치 | `e1_gen_out/c*-dcvc-no_bundles-b800-s*/result.json` |
+| 평가셋 400분 dcvc 확정 부적격(∧규칙 GT 부적격) | 47 | 47 | 일치 | `wp6_eval_400.json` rows[arm=dcvc] `CI_gt_ineligible` |
+| 평가셋 400분 dcvc-no_bundles 확정 부적격(∧규칙 GT 부적격) | 51 | 51 | 일치 | `wp6_eval_400.json` rows[arm=dcvc-no_bundles] `CI_gt_ineligible` |
+| 평가셋 400분 dcvc-no_dcv 확정 부적격(∧규칙 GT 부적격) | 47 | 47 | 일치 | `wp6_eval_400.json` rows[arm=dcvc-no_dcv] `CI_gt_ineligible` |
+| 평가셋 6000분 dcvc·no_bundles·no_dcv 확정 부적격 / 판단 대기 도달 | 124 / 20 (세 팔 같음) | 124 / 20 (세 팔 같음) | 일치 | `wp6_eval_6000.json` `CI_gt_ineligible`, `expert_ready_correct` |
+| 평가셋 400·6000분 거짓 확정 (FE·FI) | 0 | 0 (9팔 전부) | 일치 | `wp6_eval_400.json`·`wp6_eval_6000.json` |
+| 실행 commit | dba06d9 | result.json 243개 `manifest.environment.commit` 전부 `dba06d9d26b1…`, `wp6_eval_400.json` `head` 같음 | 일치 | 전체 |
+
+- 집계: 21항목 전부 일치, **불일치 0**. 수정할 수치가 없어 이전 값 노트는 만들지 않았습니다.
+- 생성기 표준편차는 표본 표준편차(n−1)입니다. 값 6개 — dcvc 800분 [2, 2, 12, 13, 0, 1], no_bundles 800분 [7, 7, 12, 13, 4, 5] (replicate 0·1·2 × seed 1·2 순).
+- 파일럿은 seed 1–5에서 값이 모두 같습니다(표준편차 0).
+- 평가셋 result_hash(`e487f6ca93a9a302` 등)가 내 실행(`0a798d99c1df5cb5`)과 다른 것은 실험 ID(arm 이름 등)가 spec에 들어가기 때문입니다(선우 03 머리말). 쌍 단위 결과는 내 dba06d9 실행과 같은 47입니다(8-2).
+- 슬라이드 6 노트의 "원자료 없음"은 "원자료 대조 완료 + 공유 브랜치 경로"로 바꿨습니다.
 
 ## 7. 이 검수에서 바꾼 것 (docs/presentation-data-gt만)
 

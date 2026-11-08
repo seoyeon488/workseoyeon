@@ -1,7 +1,7 @@
 # 발표 초안 — 데이터·GT 파트 (슬라이드 8장, 최종)
 
 작성: 서연 · 2026-11-08 최종 검수 + 선우 `dba06d9` 보고서 대조 + 최종 통합본 `integration/phase1-final` `b1d2a7f` 재확인 반영 (`docs/dev/final_review_2026-11-08.md` 9절)
-수치 기준: 평가셋·라벨은 `data/nsclc/eval` (생성 `996efd6`, 통합본 `8afe5ea`·최종 통합본 `integration/phase1-final` `b1d2a7f`에서도 같은 파일, phase1-final에서 재생성해 해시 같음). 240쌍 실행 수치는 최종 통합본 `integration/phase1-final` `b1d2a7f` 값을 쓰고(통합본 `8afe5ea`와 같음) 다른 커밋 값은 노트로. DCV·번들링 ablation은 선우 `dba06d9` 재실험 값(최종 통합본 실험 결과 아님). 코호트는 슬라이드마다 제목 아래에 적고 서로 섞지 않습니다
+수치 기준: 평가셋·라벨은 `data/nsclc/eval` (생성 `996efd6`, `8afe5ea`·`b1d2a7f`에서도 같은 파일, `b1d2a7f`에서 재생성해 해시 같음). **실행 결과 표기 규칙:** 슬라이드 5 = "`dba06d9` 기준 · `8afe5ea` 동일 결과 확인" (+ 노트 "`b1d2a7f`에서도 동일"), 슬라이드 5-1 = "`8afe5ea` 기준 · `b1d2a7f` 동일" (dba06d9 채점 기록 없음), 슬라이드 6 = "11/08 dba06d9 기준 · 최종 통합본 실험 결과 아님". 코호트는 슬라이드마다 제목 아래에 적고 서로 섞지 않습니다
 검증 수준: **데이터 검증 완료 / 임상 검수 미완료**
 명칭: 이 문서의 GT는 모두 **축소 범위 규칙 GT (임상 전문가 미검수)**입니다. 아래에서는 "규칙 GT"로 줄여 씁니다. 정확도·성능 향상 표현은 쓰지 않습니다.
 
@@ -78,7 +78,7 @@
 
 ## 슬라이드 5. 실행 결과 — 240쌍 평가셋 (입증된 것만)
 
-> 코호트: NSCLC 240쌍 평가셋 (`nsclc-eval-v1`, 80명 × 3시험) · 기준 커밋: 최종 통합본 `integration/phase1-final` `b1d2a7f` (다른 커밋 값은 노트)
+> 코호트: NSCLC 240쌍 평가셋 (`nsclc-eval-v1`, 80명 × 3시험) · **`dba06d9` 기준 · `8afe5ea` 동일 결과 확인** (노트: `b1d2a7f`에서도 동일)
 
 핵심 문장
 - full_dcvc를 6000분·horizon 80·seed 1로 한 번 실행했을 때, 판단 대기 적격 23쌍 중 20쌍이 판단 기준 외 확인을 마치고 담당의 검토 상태에 도달했습니다.
@@ -87,9 +87,9 @@
 
 | 정책 · 예산 (seed 1, 1회) | 판단 대기 적격 → EXPERT_REVIEW | 확정 부적격 ∧ 규칙 GT 부적격 | 규칙 GT 부적격 아님 + 확정 부적격 | 확정 적격 | 출처 |
 |---|---|---|---|---|---|
-| no_action(행동 없음 기준점) · 400분 · horizon 10 | 0 / 23 | 0 / 130 | 0 | 0 | `data/nsclc/eval/checks/runner_400m_h10_phase1-final.json`, `docs/dev/final_review_evidence/phase1_final_runs.json` |
+| no_action(행동 없음 기준점) · 400분 · horizon 10 | 0 / 23 | 0 / 130 | 0 | 0 | 원자료 `wp6_eval_400.json` (dba06d9), `docs/dev/final_review_evidence/r400_three_commits.json`·`phase1_final_runs.json` (동일 확인) |
 | full_dcvc · 400분 · horizon 10 | 0 / 23 | **47** / 130 | 0 | 0 | 같음 |
-| full_dcvc · 6000분 · horizon 80 | 20 / 23 | 124 / 130 | 0 | 0 | `data/nsclc/eval/checks/runner_6000m_h80_phase1-final.json`, `phase1_final_runs.json` |
+| full_dcvc · 6000분 · horizon 80 | 20 / 23 | 124 / 130 | 0 | 0 | 원자료 `wp6_eval_6000.json` (dba06d9), `runner_6000m_h80_8afe5ea_from_demo.json`·`phase1_final_runs.json` (동일 확인) |
 
 노트
 - 400분 full_dcvc는 엔진 버전에 따라 다릅니다: `4f81460` 엔진 48, `dba06d9`·`8afe5ea` 47 (두 커밋 result_hash 같음). 갈린 쌍은 P034 × NCT07416058 1쌍(확정 부적격 → 검증 대기)입니다. 원인 후보는 `39ec3d2`(biomarker 기준의 확인 항목 묶음 변경)로 계획이 step 1부터 달라진 것입니다. 재현 불안정이 아닙니다. 출처: `docs/dev/final_review_evidence/r400_three_commits.json`
@@ -100,7 +100,7 @@
 
 ## 슬라이드 5-1. P0 사례 (평가셋과 별도)
 
-> 코호트: P0 합성 사례 127건 (값 82 + 서술 20 + held-out 6 실패 25) · 기준 커밋: `4f81460` → 최종 통합본 `integration/phase1-final` `b1d2a7f` (`8afe5ea`와 사례별 결과 같음) · **합성 사례·오프라인 스텁 기준**
+> 코호트: P0 합성 사례 127건 (값 82 + 서술 20 + held-out 6 실패 25) · **`8afe5ea` 기준 · `b1d2a7f` 동일** (`dba06d9`에서는 채점하지 않아 슬라이드 5 규칙의 예외) · 수정 전 기준선 `4f81460` · **합성 사례·오프라인 스텁 기준**
 
 - 기대값은 원문 처리 원칙으로만 작성했습니다(엔진 출력을 보고 정하지 않음).
 - 오채택 36 → 22, 상충 탐지 10/27 → 15/27, 과잉 보류 4 그대로, 나빠진 사례 0 (합성 사례·오프라인 스텁 기준, 근거 확인 함수 단위 측정, 건수이며 정확도 아님)
@@ -108,7 +108,7 @@
 
 ## 슬라이드 6. DCV·번들링 ablation — 효과 미입증
 
-> 기준 커밋: `dba06d9` (선우 11/08 재실험, `share/seoyeon-experiment-reports-dba06d9` `9807a22` 03·04 보고서) · **11/08 dba06d9 기준, 최종 통합본 실험 결과 아님** · 원자료(result.json)는 선우 로컬에만 있어 GitHub에 없음
+> **11/08 dba06d9 기준 · 최종 통합본 실험 결과 아님** · 선우 11/08 재실험 (`share/seoyeon-experiment-reports-dba06d9` `9807a22` 03·04 보고서) · **원자료 대조 완료**: `share/seoyeon-experiment-raw-dba06d9` `ce4a8e1` `docs/experiments/seoyeon-handoff-dba06d9/raw/sy_b/` (result.json 243개 = 파일럿 `e1_nsclc_out/` 135 + 생성기 `e1_gen_out/` 108, 평가셋 `wp6_eval_400.json`·`wp6_eval_6000.json`), 아래 값 전부 재집계와 일치
 
 핵심 문장
 - DCV 후보 필터를 끈 no_dcv는 측정한 모든 조건에서 dcvc와 확정 수가 같았습니다. 현재 시뮬레이터 실행 모델에서는 DCV 필터의 기여를 측정할 수 없습니다(선우 04 §1).
@@ -136,7 +136,7 @@
 | 400분 | 47 | 47 | **51** (역전) |
 | 6000분 | 124 (판단 대기 도달 20) | 124 (20) | 124 (20) |
 
-- 출처: 선우 `03_LATEST_EXPERIMENT_RESULTS.md` E1-a·E1-b·E1-c, `04_DCV_ABLATION_ANALYSIS.md` §0·§2 (모두 `dba06d9`, 11/08 dba06d9 기준, 최종 통합본 실험 결과 아님)
+- 출처: 선우 `03_LATEST_EXPERIMENT_RESULTS.md` E1-a·E1-b·E1-c, `04_DCV_ABLATION_ANALYSIS.md` §0·§2, 원자료 `share/seoyeon-experiment-raw-dba06d9` `ce4a8e1` `docs/experiments/seoyeon-handoff-dba06d9/raw/sy_b/` 재집계 `docs/dev/final_review_evidence/reagg_dba06d9.json` (모두 11/08 dba06d9 기준 · 최종 통합본 실험 결과 아님)
 - 세 코호트는 GT 종류·환자 수·seed가 달라 서로 비교하지 않습니다.
 
 ## 슬라이드 7. 한계
@@ -145,7 +145,7 @@
 
 핵심 문장
 - 합성 데이터·축소 범위·임상 전문가 미검수 상태의 결과이고, 정책 간 상대 비교만 가능합니다.
-- DCV·번들링 효과는 이번 실험 조건(`dba06d9`, 최종 통합본 실험 결과 아님)에서 차이 없음 또는 역전이라 입증되지 않았습니다. 추가 검증이 필요합니다.
+- DCV·번들링 효과는 이번 실험 조건(11/08 dba06d9 기준 · 최종 통합본 실험 결과 아님)에서 차이 없음 또는 역전이라 입증되지 않았습니다. 추가 검증이 필요합니다.
 
 | 한계 | 내용 | 출처 |
 |---|---|---|
@@ -153,7 +153,7 @@
 | 축소 범위 | 160개 중 72개만 판정, 범위 밖 79개 미평가. 전체 프로토콜 적격성 주장 불가 | `criteria_verification.csv` |
 | 임상 전문가 미검수 | 모든 검수표 `clinical_review = 미완료`. 규칙 GT는 임상 판정 결과가 아님 | 같음 |
 | 가정 비용 | 분은 엔진 카탈로그의 가정 비용, 응답 확률도 가정값. 실제 업무 시간 절감 주장 불가 | `docs/dev/p_common_engine_2026_11_07.md` |
-| DCV·번들링 효과 미입증 | 슬라이드 6. no_dcv = dcvc (측정 불가), no_bundles는 큰 예산에서 역전. 구간 추정 없음, 240쌍 평가셋은 seed 1 한 번 | 선우 03·04 보고서 (`dba06d9`, 최종 통합본 실험 결과 아님) |
+| DCV·번들링 효과 미입증 | 슬라이드 6. no_dcv = dcvc (측정 불가), no_bundles는 큰 예산에서 역전. 구간 추정 없음, 240쌍 평가셋은 seed 1 한 번 | 선우 03·04 보고서·원자료 (11/08 dba06d9 기준 · 최종 통합본 실험 결과 아님) |
 | 검사 수치 미포함 | 6개 시험 원문에 검사 기준값이 없어 검사 수치 기준 0건. NCT05255302 추가는 후속 과제 (재파싱 없이는 수동 보정 2건 필요, 이번에는 재파싱 안 함) | `lab_reference.json` |
 | 확정 적격 지표 없음 | 규칙 GT 확정 적격 0 | `label_summary.json` |
 | P0 남은 오채택 | 127건 중 22 (같은 항목 다른 값 7, 시점 차이 4, 부정 후 번복 4, 문서 vs 자가보고 서술 4, 다른 사람 값 2, held-out 상충 1). 합성 사례·오프라인 스텁 기준 | `p0_fact_cases_8afe5ea_score.md` |
@@ -178,4 +178,6 @@
 | DCV·번들링 수치 | `3e4b2fd`(11-07) 데모·파일럿·생성기, 11.17 vs 8.17 | `dba06d9` 재실험 값, 코호트별 표 분리 | 선우 03·04 보고서 대조 (21:46) |
 | 400분 full_dcvc | 48 (`4f81460`) | 47 (`8afe5ea`), 48은 노트 | 엔진 버전 차이 확인 |
 | 기준 커밋 | `8afe5ea` | `integration/phase1-final` `b1d2a7f` (값 전부 같음, 8afe5ea는 노트) | 최종 통합 브랜치 대조 (23시) |
+| 표기 통일 | 슬라이드마다 다른 커밋 표기 | 5 = dba06d9 기준·8afe5ea 동일(+b1d2a7f 노트), 5-1 = 8afe5ea 기준·b1d2a7f 동일, 6 = dba06d9 기준·최종 통합본 실험 결과 아님 | 수치 고정 (24시) |
+| 슬라이드 6 원자료 | "원자료 없음" | 원자료 대조 완료 (불일치 0) | 선우 raw 공유 (22:06) |
 | P0 슬라이드 | 실행 결과 슬라이드 안 | 슬라이드 5-1로 분리, "합성 사례·오프라인 스텁 기준" | 코호트 분리 |
