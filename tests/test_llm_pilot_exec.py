@@ -483,8 +483,18 @@ def merge_protection_problems(ours: dict[str, str], theirs: dict[str, str], stat
     return problems
 
 
+def _in_git_work_tree() -> bool:
+    try:
+        out = subprocess.run(["git", "rev-parse", "--is-inside-work-tree"], cwd=ROOT, capture_output=True, text=True)
+    except OSError:
+        return False
+    return out.returncode == 0 and out.stdout.strip() == "true"
+
+
 def test_frozen_store_and_policy_files_unchanged():
-    assert store_patch.verify_frozen() == []
+    assert store_patch.verify_frozen() == []  # 잠긴 기준표 해시: git 없이도 항상 검사
+    if not _in_git_work_tree():  # 제출 압축본(git archive)에는 .git이 없어 HEAD와 비교할 수 없음. 해시 검사만으로 끝냄
+        pytest.skip("git 작업 트리가 아님 (압축본): 보호 파일의 HEAD 대비 diff 검사 생략, 잠긴 기준표 해시는 위에서 확인")
     if not (ROOT / ".git" / "MERGE_HEAD").exists():
         assert _git("diff", "--name-only", "HEAD", "--", *PROTECTED).strip() == ""
         return

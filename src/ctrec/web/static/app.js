@@ -17,7 +17,7 @@ const STATUS = {
   CRITERIA_MATCH: ["공개 기준 충족", "ok", "공개 기준 모두 충족 · 참여 확정 아님"],
   POTENTIAL_MATCH: ["기록 확인 시 충족 가능", "warn", "답변상 충족 · 진료 기록 확인 필요"],
   NEEDS_REVIEW: ["의료진 검토 필요", "warn", "의사가 직접 판단할 조건이 있음"],
-  INSUFFICIENT_INFORMATION: ["추가 정보 필요", "warn", "아직 확인 못 한 정보가 있음 (안 맞는다는 뜻은 아님)"],
+  INSUFFICIENT_INFORMATION: ["추가 정보 필요", "warn", "아직 확인 못 한 정보가 있어 결과를 확정하지 않음"],
   CRITERIA_MISMATCH: ["공개 기준 불충족", "bad", "맞지 않는 조건 있음"],
   NOT_EVALUATED: ["평가 실패", "warn", "평가 오류 · 부적격 아님"],
 };

@@ -167,8 +167,9 @@ sequenceDiagram
   - **코호트별 기준**: 기준이 참여자 군(예: IM군 / 대조군, Cohort A / B)마다 다르면, 기준 파싱 에이전트가 각 규칙에 코호트를 표시합니다. 매칭은 "공통 기준 + 해당 코호트 기준"으로 코호트마다 따로 판정하고, 가장 유리한 코호트 결과를 채택해 `matched_cohort`와 `cohort_results`에 기록합니다. 다른 코호트 전용 기준(예: "대조군은 IM 의심 시 제외")이 판정을 막지 않습니다.
   - **조건부 기준**: "Men who can father a child: must use contraception"처럼 특정 집단에만 적용되는 기준에서 환자가 그 집단이 아니면 `applicable=false`로 표시하고 **해당 없음 = 통과**로 처리합니다. "해당 없음"과 "조건 불성립"을 구분하기 위한 장치입니다.
 - **원문에 구체 기준이 없는 항목은 '의사 확인 필요'로 분류**: "Use of certain medications", "clinically significant abnormalities", "연구자 판단" 같은 기준은 공개된 원문에 약물 목록이나 기준값이 없어 시스템이 판정할 수 없습니다.
-  - **기준 파싱**: 이런 기준에 `underspecified` 표시를 붙입니다. "환자 정보가 완벽해도 원문만으로 판정 불가한 경우"에만 붙이고, "Crohn's disease"처럼 구체적인 질환·소견은 제외합니다. 이 표시는 적격 판정을 막지 않으므로, 남발하면 잘못 적격으로 판정할 위험이 커집니다.
-  - **매칭**: 적격 판정을 막지 않고 "의사 확인 필요"로 분류합니다. 예: `ELIGIBLE: 통과 5 / 불충족 0 / 판정불가 0 (+의사 확인 필요 1)`
+  - **기준 파싱**: 이런 기준에 `underspecified` 표시를 붙입니다. "환자 정보가 완벽해도 원문만으로 판정 불가한 경우"에만 붙이고, "Crohn's disease"처럼 구체적인 질환·소견은 제외합니다. 이 표시가 붙은 기준은 임상의 판단 전까지 확정되지 않으므로, 남발하면 확정할 수 있는 시험도 '의료진 검토 필요'에 머뭅니다.
+  - **매칭 (임상의 판단 경계, `expert_boundary.py`)**: LLM·규칙 엔진·판정기가 어떤 값을 내도 이 기준은 판정 보류(`unknown`)로 되돌리고, 시험 판정은 **적격이 아니라 `UNCERTAIN`**, 외부 상태는 `NEEDS_REVIEW`(의료진 검토 필요)가 됩니다. 예: `UNCERTAIN: 통과 5 / 불충족 0 / 판정불가 0 (+의사 확인 필요 1)`. 다른 기준의 불충족은 그대로 부적격입니다. 정책 엔진 경로(웹 데모)에서는 같은 기준이 `EXPERT_REVIEW` 쌍과 임상의 검토 요청이 되고, 서버가 인정한 임상의 판단(합성 권한)으로만 확정됩니다. 두 경로가 같은 경계 함수를 씁니다.
+  - **분류 신호**: `underspecified` 표시, 슬롯 후보표의 임상의 판단 기준(`EXPERT_RULES`), 최종 감사에서 추가한 저장 기준 목록(`AUDIT_EXPERT_RULES`), 원문이 판정 주체를 임상의로 명시한 표현("in the opinion of the investigator" 등)입니다. 판단 주체 없이 "clinically significant ..."만 있는 새 시험의 기준은 아직 자동으로 막지 못합니다(9.1).
   - **확인 질문**: 판정용 질문과 별도로 **의사 참고용 질문**(`purpose: physician_reference`)을 한 번 만들어 관련 사실을 수집합니다. 예: "현재 복용 중인 약(처방약, 일반의약품, 한약, 건강기능식품 포함)을 모두 알려주세요."
   - **추천·보고서**: 추천된 시험마다 해당 기준, 환자 응답, 기록상 복용 약물을 묶어 `physician_review`에 적습니다. `report.md`에는 코드가 **"의사 확인 필요 사항 (참고)"** 섹션을 고정으로 붙여, 참여 여부를 최종 결정할 때 담당 의사가 전체 프로토콜(금지 약물 목록 등)과 대조할 수 있게 합니다.
 - **통일된 판정 의미**: 각 규칙은 "조건이 환자에게 성립하는가(`holds`)"로 판정합니다. 선정 기준은 `yes`여야, 제외 기준은 `no`여야 통과입니다.
@@ -186,18 +187,22 @@ sequenceDiagram
 Python 3.10 이상이 필요합니다.
 
 > **Python 버전과 의존성 (팀 결정 대기)**
-> - `pyproject.toml`은 `>=3.10`입니다. 테스트와 3.0 재현은 **3.10.11**에서 했고, 배포 설정 `render.yaml`은 **3.13.5**입니다. 3.13.5에서는 테스트하지 않았습니다.
-> - `requirements.txt`·`pyproject.toml`의 의존성은 하한만 있습니다(`anthropic`만 `<2` 상한). **lock 파일(`requirements.lock.txt`)은 저장소에 없습니다.** 아래 "lock을 함께 제출" 안내는 아직 이행되지 않았습니다.
+> - `pyproject.toml`은 `>=3.10`입니다. 테스트와 3.0 재현은 **3.10.11**(Windows)에서 했고, 배포 설정 `render.yaml`은 **3.13.5**입니다. **3.13.5에서는 테스트하지 않았습니다.** 제출 기준으로 검증된 버전은 3.10.11뿐입니다.
+> - `requirements.txt`·`pyproject.toml`의 의존성은 하한만 있습니다(`anthropic`만 `<2` 상한). **`requirements.lock.txt`는 검증 환경 기록입니다**: 3.10.11 새 venv에서 `pip install -e ".[dev,web]"` 뒤 `pip freeze --exclude-editable`로 만든 버전 목록이고, 이 목록으로 전체 테스트를 돌렸습니다(9.1). 배포 Python 버전을 정한 것은 아닙니다.
 > - `playwright`(브라우저 E2E, 선택)는 requirements·extras에 없어 따로 설치합니다(`docs/team_local_setup.md` 4절).
 > - **editable 설치 필수:** `pip install .`(비 editable)로 설치하면 `config.ROOT`가 site-packages 쪽을 가리켜 `data/`를 찾지 못합니다(`verify_frozen()`이 "FROZEN.json이 없거나 비어 있음"을 냄). `pip install -e ".[dev,web]"`로 설치하거나 `PYTHONPATH=src`로 실행하세요.
 > - **Windows 콘솔:** 출력이 파일·파이프로 갈 때 기본 인코딩(cp949)에서 CLI가 `⚠️`를 쓰다 `UnicodeEncodeError`로 끝납니다. `PYTHONUTF8=1`(PowerShell: `$env:PYTHONUTF8='1'`)을 설정하세요.
+> - **Windows에서 `pip install -r requirements.txt`:** 이 파일의 한국어 주석 때문에 기본 인코딩(cp949)의 pip가 `UnicodeDecodeError`로 멈춥니다. `PYTHONUTF8=1`을 먼저 설정하거나 `pip install -e ".[dev,web]"` 또는 `requirements.lock.txt`(ASCII)를 쓰세요. Linux 배포(Render)는 해당 없습니다.
 > - 제안(미결정): 제출 기준 Python 버전 하나를 정하고, 그 버전의 깨끗한 venv에서 `pip install -e ".[dev,web]"` → `pip freeze > requirements.lock.txt`를 만든 뒤 테스트를 한 번 더 돌려 기록합니다. 3.13.5를 유지한다면 3.13에서도 테스트가 필요합니다.
 
 ```bash
-python3 -m venv ~/.venvs/ctrec && source ~/.venvs/ctrec/bin/activate
-pip install -e ".[dev,web]"      # 또는 pip install -r requirements.txt && pip install -e .
-cp .env.example .env             # ANTHROPIC_API_KEY 입력
+python3 -m venv ~/.venvs/ctrec && source ~/.venvs/ctrec/bin/activate   # Windows: py -3.10 -m venv .venv && .venv\Scripts\activate
+pip install -e ".[dev,web]"      # 검증 환경 그대로: pip install -r requirements.lock.txt && pip install -e . --no-deps
+pytest -q                        # API 키 없이 도는 테스트 (아래). .env를 만들기 전에 실행
+cp .env.example .env             # 실제 API를 쓸 때만. ANTHROPIC_API_KEY 입력 (키 없는 합성 데모(3.0)에는 필요 없음)
 ```
+
+> **`.env`와 테스트:** `config.py`가 `.env`를 읽습니다. `.env.example`을 그대로 복사하면 `CTREC_FALLBACKS=0`이 적용되어 `tests/test_llm_pilot_exec.py::test_concurrent_reservations_respect_cost_cap` 1건이 실패합니다(테스트가 이 설정에 의존하는 알려진 문제, 비용 상한 초과가 아님). 테스트는 `.env` 없이 돌리세요.
 
 > **가상환경은 iCloud Drive 밖에 만드세요.** 프로젝트 폴더가 iCloud 안에 있으면 macOS가 가상환경 속 `.pth` 파일에 숨김 속성을 붙이고, Python 3.13이 이를 무시해 `ModuleNotFoundError: No module named 'ctrec'`가 발생합니다. 위 예시처럼 `~/.venvs/ctrec`에 만들면 이 문제가 없고, 패키지 파일 수천 개가 iCloud로 동기화되는 것도 막을 수 있습니다.
 
@@ -219,7 +224,16 @@ pytest -q
 
 ### 3.0 키 없는 합성 데모·재현 (API 키·네트워크 불필요)
 
-아래 명령은 API 키 없이 돌아갑니다. 실제 LLM 호출은 막혀 있고(오프라인 대역), 환자·시험은 모두 합성 데이터입니다. 2026-11-08에 dba06d9, Windows, Python 3.10.11, `PYTHONPATH=src`로 실제 실행했습니다. 출력과 시간은 그 실행의 값입니다.
+아래 명령은 API 키 없이 돌아갑니다. 실제 LLM 호출은 막혀 있고(오프라인 대역), 환자·시험은 모두 합성 데이터입니다. 처음에는 2026-11-08 dba06d9에서, 마지막으로 2026-11-09 integration/phase1-final 66cf3c7(P1-3·P1-4, PR #59·#60 포함) + 릴리스 준비 변경(10절)에서 Windows · Python 3.10.11 새 venv(editable 설치)로 다시 실행했습니다. 기대 출력의 수치는 마지막 실행과 같고, 시간은 실행마다 다릅니다.
+
+필수 환경 변수 (키 없는 합성 데모)
+
+| 변수 | 필요 | 설명 |
+|---|---|---|
+| `CTREC_SYNTHETIC_SIGNING_SECRET` | 고정 권장 | 합성 서류 확인·의사 판단 서명 비밀. **16자 이상**이어야 합니다. 짧으면 서버가 `verification role blocked: [...missing_or_short]`를 출력하고 서류 확인·의사 판단 API가 503(`verification_misconfigured`)을 돌려줍니다. 비우면 실행마다 새로 만들어 재시작 뒤 이전 확인이 인정되지 않습니다 |
+| `CTREC_STAFF_KEY` | `--demo-staff`면 선택 | 담당자 키. `--demo-staff`는 루프백 접속에서 키 없이 담당자 탭을 엽니다. 다른 컴퓨터에서 담당자 API를 쓰면 필요 (16자 이상 권장) |
+| `ANTHROPIC_API_KEY` | 불필요 | 비워 두세요. 데모 서버는 키를 넘기지 않는 오프라인 대역입니다 |
+| `PYTHONUTF8=1` 또는 `PYTHONIOENCODING=utf-8` | Windows 권장 | 콘솔(cp949)에서 한국어·기호 출력 오류 방지 |
 
 ```bash
 # 0) 준비: 저장소 루트에서. editable 설치가 이 폴더를 가리키지 않으면 PYTHONPATH가 필요합니다(2절)
@@ -228,12 +242,15 @@ export PYTHONIOENCODING=utf-8    # Windows 콘솔(cp949)에서 한국어 출력�
 python -c "from ctrec import store_patch; print(store_patch.verify_frozen())"   # [] = 잠긴 기준표 26개 해시 일치
 
 # 1) 발표용 데모 서버 (환자 ↔ 연구 담당자 탭, 서류 확인·의사 판단까지)
-#    값은 아무 문자열이나 됩니다(예시는 가짜 값). 비우면 서버가 실행마다 새로 만들어 화면에 출력합니다.
+#    값은 16자 이상의 아무 문자열이면 됩니다(예시는 가짜 값). 짧으면 서류 확인·의사 판단이 503으로 막힙니다(위 표).
 #    서명 비밀을 고정하지 않으면 재시작 뒤 이전 서류 확인·의사 판단이 인정되지 않습니다.
-export CTREC_STAFF_KEY=<아무-값>
-export CTREC_SYNTHETIC_SIGNING_SECRET=<아무-값>
+export CTREC_STAFF_KEY=demo-staff-key-0000000
+export CTREC_SYNTHETIC_SIGNING_SECRET=demo-signing-secret-000000
 python scripts/followup_demo_server.py --port 8791 --demo-staff --synthetic-verification --store <빈-폴더>
 # -> "followup demo (offline, synthetic): http://127.0.0.1:8791  store=..."  종료는 Ctrl+C
+#    "verification role blocked" 줄이 보이면 서명 비밀이 짧은 것입니다
+# 발표용: --seed-demo를 더하면 빈 저장소에 합성 NSCLC 환자 6명(시험 8개 T-A~H)을 미리 넣습니다(10절 PR #58).
+#   시험이 6개 이상이면 환자 탭이 시험을 미리 선택하지 않으므로, 새 환자를 신청할 때 T-A~D를 직접 고르세요.
 ```
 
 - `--synthetic-verification`이 없으면 서류 확인·의사 판단 API가 닫혀(503) 서류가 필요한 쌍이 '확인 대기'에서 멈춥니다. 10절 2026-11-07(#38) 항목의 발표 실행 명령에는 이 플래그가 빠져 있으니 위 명령을 쓰세요.
@@ -244,7 +261,9 @@ python scripts/followup_demo_server.py --port 8791 --demo-staff --synthetic-veri
 ```bash
 # 2) 끝까지 자동 실행 (LLM 0회, 결정적): 위 서버를 띄운 채로
 python scripts/run_e2e_synthetic.py --mode offline --url http://127.0.0.1:8791 --out <출력-폴더>
-#   --url을 빼면 스크립트가 자체 데모 서버를 띄우고 끝나면 끕니다(이번에는 --url로만 확인)
+#   --url을 빼면 스크립트가 자체 데모 서버를 띄우고 끝나면 끕니다(두 방식 모두 확인)
+#   --url은 --seed-demo 없이 띄운 새 저장소 서버에 쓰세요. 같은 서버에서 다시 돌리면 판정은 같지만
+#   '가정 분'은 서버 전체 합계라 198 -> 396 -> 594분으로 늘어납니다
 ```
 기대 출력(약 10초, 종료 코드 0. 안전 위반이 있으면 1). integration/phase1-final(PR #53 8afe5ea 병합 뒤)에서 3회 실행해 시간 외에는 report.json·행동 기록이 모두 같았습니다(병합 전에도 5회 동일):
 ```
@@ -701,18 +720,37 @@ python scripts/generate_synthetic_patients.py --trial data/trials/NCT0XXXXXXX.js
 | 정책 비교 (NSCLC 파일럿, 30·90·400분, seed 1) | dcvc 확정 부적격 6·8·8, no_bundles 2·4·14, 기준선 0, 거짓 확정 0 (dba06d9와 같음) |
 | NSCLC 평가셋 runner | 400분 확정 부적격∧GT 부적격 47/130, 6000분 판단 기준 외 확인 완료 20/23·124/130, 거짓 확정 0 (`data/nsclc/eval/checks/*_phase1-final.json`) |
 
+릴리스 준비 재확인 (2026-11-09, integration/phase1-final 66cf3c7 = P1-3·P1-4 안전성 수정, PR #59·#60 포함 + 10절 릴리스 준비 변경, Windows · Python 3.10.11 새 venv, PYTHONPATH·기존 venv·pip 캐시 없이)
+
+| 확인 | 결과 |
+|---|---|
+| 설치 | `pip install -e ".[dev,web]"` 성공, `ctrec.__file__`이 이 저장소의 `src`. `requirements.lock.txt`로 새 venv에 설치해도 같은 패키지 목록 (66cf3c7 검증은 lock 설치 venv로 함) |
+| 잠긴 기준표 해시 | `verify_frozen()` = `[]` |
+| 전체 테스트 | `pytest -q` (`.env` 없음): 6305 passed, 9 skipped(심볼릭 링크 8 · 브라우저 1), 3 xfailed (4a9ddb9에서는 6303 passed, PR #59 테스트 2건 추가) |
+| git 없는 압축본 | 저장소 파일만 복사한 폴더(`.git` 없음)에서 전체 테스트: 6304 passed, 10 skipped, 3 xfailed. 늘어난 skip 1건은 `test_frozen_store_and_policy_files_unchanged`의 git diff 검사이고 잠긴 기준표 해시 검사는 통과 |
+| 합성 E2E 오프라인 | `--url`(새 저장소 서버)·자체 서버, 4a9ddb9에서 4회·66cf3c7에서 3회 모두 참여 가능 확정 4 + 의사 판단 뒤 6 / 참여 불가 확정 4 / 미확정 10 / 안전 위반 0 |
+| 서류 확인·의사 판단 경로 / 환자 질문 흐름 | OK 28 checks, 27 HTTP calls / 종료 코드 0, http_calls 22, 재시작 2회 |
+| 정책 비교 (NSCLC 파일럿 90분, seed 1) | dcvc·no_dcv·no_recovery 확정 부적격 8, no_bundles·no_evidence_routing 4, 기준선 3종 0, 거짓 확정 0 |
+| NSCLC 평가셋 runner | 400분 47/130, 6000분 20/23·124/130, 거짓 확정 0. 쌍 상태 분포까지 `*_phase1-final.json`과 같음 |
+| 실행 확인 | `python -m ctrec --help`·`ctrec --help` 종료 코드 0, 웹 앱 `uvicorn ctrec.web.app:app` `/healthz` 200, 데모 서버 `/healthz` 200 |
+| 배포 설정 점검 (파일만 읽음) | `scripts/check_web_deployment.py --target record`: PASS 15 / WARNING 2(프록시 헤더 신뢰, Python 3.13.5 미검증) / BLOCKED 0 / UNVERIFIED 3(대시보드 값). **실제 Render 배포는 하지 않았습니다** |
+| 담당자 화면 절약 수치 (`--seed-demo` 새 저장소) | 화면 첫 숫자: 남은 확인 32건 · 하나씩 402분 → 묶으면 276분 · 126분(31%) 절약 (`staff.js`가 의사 판단 요청을 빼고 셈, 10절 동겸 기록과 같음). API `insight.summary`는 의사 판단 6건·12분을 더한 38건 · 414분 → 288분, 결과가 나올 수 있는 시험 최대 36개. 수정 전(1d31e44)도 같은 값. **발표에는 화면에 보이는 값을 쓰세요.** 분은 모두 가정 비용입니다 |
+
 **확인하지 않은 것**
-- **깨끗한 환경 설치:** dba06d9 확인 때는 기존 venv를 썼습니다. 통합 브랜치에서는 새 venv(Python 3.10.11)와 `git archive` 압축본으로 따로 확인했습니다(통합 보고서). 3.13은 확인하지 않았습니다.
-- **브라우저 화면:** 이번 재현에서는 화면을 열지 않았습니다. 10절의 브라우저 확인 기록은 각 작업자가 남긴 보고입니다.
+- **깨끗한 환경 설치:** dba06d9 확인 때는 기존 venv를 썼습니다. 릴리스 준비 재확인(위 표)은 새 venv(Python 3.10.11)에서 했습니다. **Python 3.13.5(render.yaml 배포 버전)는 이 환경에 설치되어 있지 않아 확인하지 않았습니다.** macOS·Linux에서도 실행하지 않았습니다.
+- **실제 배포:** Render에 배포해 보지 않았습니다. 배포 설정은 파일 점검만 했습니다.
+- **브라우저 화면:** 자동 브라우저 테스트(`tests/test_web_browser.py`)는 playwright가 없어 실행되지 않았습니다(skip, 통과로 세지 않음). 4a9ddb9와 66cf3c7에서 W1~W3(10절)는 HTTP로 끝까지 확인했고(66cf3c7에서는 '처음부터 다시' 초기화 API도), Chrome에서는 담당자 화면·질문 보내기·서류 처리·재평가까지 사람이 확인했습니다. **W2의 환자 직접 응답과 W3 전체 흐름은 브라우저로 확인하지 않았습니다.**
 - **실제 LLM 판정:** 실제 Claude로 판정한 경로는 이번에 검증하지 않았습니다. 10절의 LLM 모드 E2E(`--mode llm`)도 LLM이 가상 서류·소개글을 쓰고 읽는 데만 썼고, 판정은 오프라인 대역이 했습니다.
 - **CLI `ctrec run`:** 키가 필요해서 실행하지 않았습니다(3.1).
-- **전체 테스트:** dba06d9 보고값은 6148 passed입니다. 통합 브랜치의 결과는 통합 보고서에 있습니다.
+- **전체 테스트:** dba06d9 보고값은 6148 passed입니다. 최종 결과는 위 '릴리스 준비 재확인' 표에 있습니다(이전 문장이 가리키던 통합 보고서는 저장소에 없는 로컬 파일이었습니다).
 - **임상 검수:** 모든 GT와 라벨은 합성이고, 임상의 검수를 받지 않았습니다.
 
 **남은 안전 한계** (코드에서 확인함)
 - **CL-B1 (이 브랜치에서 반영):** 의료진·간호사·외부 기관·대명사가 전한 값도 가족 전언과 같이 보류합니다(`value_grounding.CLB1_RELAY_HOLD = True`). 직접 측정 문장과 서버 문서 확인은 그대로 채택합니다. 표현 목록은 임상 검수를 받지 않았고, "Critical value called to Dr. X" 같은 문장은 과잉 보류될 수 있습니다.
 - **서술 상충 탐지에 빈틈이 있습니다** (CL-A1). 다른 절의 "r/o X"·"?X"는 의심으로 보지 않아 상충으로 잡지 않습니다(`evidence_directness.py`, 주석 "CL-A1 대기"). 최종 감사의 탐침 기준으로는 일부 질환 상위어·하위어 묶음(예: 신장 이식, 쇼그렌)도 빠져 있습니다.
 - **F-03 (이 브랜치에서 반영):** 임상의 판단 API는 `expected_revision`이 없으면 428, 다르면 409로 거절하고 판정을 바꾸지 않습니다. 역할 확인(403)과 운영 설정(503)이 먼저입니다.
+- **임상의 판단 기준 분류 (P1-3, 4a9ddb9에서 반영):** 플래그·후보표 밖에서 판단을 임상의에게 맡기는 저장 기준 4개를 등록하고(`expert_boundary.AUDIT_EXPERT_RULES`), 원문이 판정 주체를 임상의로 명시한 표현은 목록 밖 새 시험에서도 막습니다. 판단 주체 없이 "clinically significant ..."만 있는 새 시험 기준과 NCT07680790:I4(RECIST "as assessed by the investigator", 등록 여부 결정 대기)는 자동으로 막지 못합니다. 목록은 임상 검수를 받지 않았습니다.
+- **미확정 부적격 표시 (P1-4, 4a9ddb9에서 반영):** 엔진이 확정하지 않은 불충족(예: 근거 서류 확인 전의 자기 보고 나이, 진료 기록이라고 선언만 한 값)은 '공개 기준 불충족'이 아니라 '추가 정보 필요'(상충이 있으면 '의료진 검토 필요')로 보이고, 확정 제외 목록이 아니라 `held_out`에 남습니다. 판정(`eligibility`)과 쌍 상태는 그대로이고, 근거가 문서로 확인되면 '공개 기준 불충족'으로 확정됩니다. 확정과 의심을 화면에서 구분하는 전용 상태는 없습니다(문구로만 구분).
 - **문서 소진 뒤 보류:** 결과지·진료기록을 모두 '구할 수 없음'으로 표시하면 그 항목은 환자 질문으로 되돌아가지 않고 `DEFER item_sources_exhausted`가 됩니다. 쌍은 `BLOCKED_FAILURE`('추가 확인 경로 없음 · 보류', 부적격 아님)이고, 자동으로 생긴 임상 검토 요청은 의사가 끝낼 수 없으므로 화면의 할 일·진행 중인 요청 수에서 빠집니다. 서류 전체를 구할 수 없음(`document_unavailable`)은 그 정보원의 모든 항목을 소진시키므로, ECOG처럼 환자에게 물어볼 수 있었던 항목도 묻지 않고 소진될 수 있습니다(항목 범위 결정 대기).
 - **주 지표를 측정할 수 없습니다.** 주 지표는 "정확히 확정한 적격 쌍"입니다. 그런데 NSCLC 규칙 GT(`data/nsclc/eval/pair_gt.csv`, 240쌍)에는 확정 적격 라벨이 0개입니다(INELIGIBLE 130, NOT_EVALUATED 87, PENDING_EXPERT_ELIGIBLE 23). 그래서 이 지표는 아직 잴 수 없습니다. 3.0 실험 결과도 부적격 확정 수만 비교합니다.
 - **NSCLC GT는 임상 검수를 받지 않았습니다** (`clinical_review` = 미완료). 작성자가 프로토콜을 읽어 만든 라벨입니다.
@@ -725,6 +763,22 @@ python scripts/generate_synthetic_patients.py --trial data/trials/NCT0XXXXXXX.js
 ## 10. 변경 이력
 
 수정할 때마다 무엇을 왜 바꿨는지 여기에 기록합니다. 최신 항목이 위에 옵니다.
+
+### 2026-11-09 — Phase 1 제출 준비: 설치·실행 안내와 안전성 설명 정리 (66cf3c7 위)
+
+새 기능 없이, 제출물을 README대로 재현할 때 막히던 곳과 코드와 다른 설명만 고쳤습니다. 판정·데이터·GT·실험 원자료는 바꾸지 않았습니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | 1.4의 underspecified 설명이 코드와 반대였음("적격 판정을 막지 않음", 예시 `ELIGIBLE ... (+의사 확인 필요 1)`). 실제로는 `UNCERTAIN`/`NEEDS_REVIEW`이고 임상의 판단으로만 확정됨. 분류 신호 4가지와 남은 빈틈을 적음 | `README.md` |
+| 2 | 3.0의 서명 비밀 안내 "아무 문자열"을 **16자 이상**으로 고침. 짧으면 서류 확인·의사 판단이 503으로 막힘(재현 확인). 필수 환경 변수 표, `--seed-demo` 안내, `--url` 재사용 시 '가정 분' 누적 안내 추가 | `README.md` |
+| 3 | 2절 설치 순서: 테스트를 `.env` 만들기 전에 돌림(`.env.example`의 `CTREC_FALLBACKS=0`이 테스트 1건을 실패시키는 알려진 문제). Windows에서 `pip install -r requirements.txt`가 한국어 주석 때문에 cp949로 실패하는 점 안내 | `README.md` |
+| 4 | 검증 환경 기록 `requirements.lock.txt` 추가 (Python 3.10.11 새 venv의 `pip freeze --exclude-editable`, ASCII). 이 목록으로 새 venv에 설치하면 테스트한 환경과 같은 패키지가 됨. 배포 Python 버전 결정은 아님 | `requirements.lock.txt` (신규) |
+| 5 | git 없는 제출 압축본에서 `test_frozen_store_and_policy_files_unchanged`가 `git diff` 실패로 깨지던 문제: 잠긴 기준표 해시 검사는 그대로 하고, git 작업 트리가 아닐 때만 HEAD 대비 diff 검사를 이유와 함께 skip | `tests/test_llm_pilot_exec.py` |
+| 6 | 환자 화면 '추가 정보 필요'의 설명 "아직 확인 못 한 정보가 있음 (안 맞는다는 뜻은 아님)" -> "아직 확인 못 한 정보가 있어 결과를 확정하지 않음". P1-4 뒤 근거 확인 전 부적격 의심(예: W3 7세 환자)에도 이 상태가 쓰여 "안 맞는다는 뜻은 아님"이 사실이 아닐 수 있었음 | `src/ctrec/web/static/app.js` |
+| 7 | 9.1에 릴리스 준비 재확인 표, P1-3·P1-4 한계, 미검증 항목(Python 3.13.5, 실제 배포, 브라우저 W2·W3) 추가. 담당자 화면 첫 숫자(32건 · 402 -> 276분)와 API `insight.summary` 합계(38건 · 414 -> 288분, 의사 판단 요청 포함)를 구분해 적음 | `README.md` |
+
+남은 것 (이번에 고치지 않음): LICENSE와 사업단 데이터 이용 조건(팀 결정), Python 3.13.5 검증 또는 배포 버전 변경, 브라우저 자동 테스트(playwright 미설치), 같은 기준의 임상 검토 요청 2건 중복(W1 T-D:I2, 판단 한 번에 함께 닫힘), `test_concurrent_reservations_respect_cost_cap`의 설정 의존, 과거 보고서 문서 9개의 로컬 절대경로.
 
 ### 2026-11-09 — 연구 담당자 화면의 작은 안내 문구 정리 (동겸)
 
