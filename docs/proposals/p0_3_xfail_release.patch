@@ -1,0 +1,22 @@
+diff --git a/tests/data/p0_3_region_cases.json b/tests/data/p0_3_region_cases.json
+index d0dc5d0..7fb1467 100644
+--- a/tests/data/p0_3_region_cases.json
++++ b/tests/data/p0_3_region_cases.json
+@@ -153,7 +153,7 @@
+     "I1": "UNKNOWN",
+     "I2": "MET"
+    },
+-   "known_defect": true
++   "known_defect": false
+   },
+   {
+    "case_id": "age20-USA",
+@@ -227,7 +227,7 @@
+     "I1": "UNKNOWN",
+     "I2": "MET"
+    },
+-   "known_defect": true
++   "known_defect": false
+   },
+   {
+    "case_id": "age22-unknown",

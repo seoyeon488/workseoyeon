@@ -1,108 +1,121 @@
-# 발표 초안 — 데이터·GT 파트 (슬라이드 5장)
+# 발표 초안 — 데이터·GT 파트 (슬라이드 6장, 최종)
 
-작성: 서연 · 2026-11-08 · 수치 기준: `integration/dcvc` `4f81460` + PR #43 평가셋
-검증 수준: 데이터 검증 완료 / 임상 검수 미완료
+작성: 서연 · 2026-11-08 최종 검수 반영 (`docs/dev/final_review_2026-11-08.md`)
+수치 기준: 평가셋·라벨은 `data/nsclc/eval` (생성 `996efd6`, 통합본 `urgent/integration` `8afe5ea`에서도 같은 파일). 실행 수치는 `integration/dcvc` `4f81460` 기록 + 통합본 `8afe5ea` 재확인
+검증 수준: **데이터 검증 완료 / 임상 검수 미완료**
+명칭: 이 문서의 GT는 모두 **축소 범위 규칙 GT (임상 전문가 미검수)**입니다. 아래에서는 "규칙 GT"로 줄여 씁니다. 정확도·성능 향상 표현은 쓰지 않습니다.
 
 ---
 
 ## 슬라이드 1. 데이터 출처
 
-- 프로토콜: ClinicalTrials.gov 실제 NSCLC 시험 8건
-  - 출처: `data/nsclc/trials/*.json`
-- 조회 시점: 2026-11-02
-  - 출처: `data/nsclc/trials/*.json` `source.retrieved_at`
-- 파싱 완료 6건, 파싱 미완료 2건 (API 크레딧)
-  - 출처: `data/nsclc/review/protocol_status.csv`
-- 기준 160개 (6건 합계)
-  - 출처: `data/nsclc/review/criteria_verification.csv`
-- 환자: 합성 80명, 실제 환자 정보 없음
-  - 출처: `data/nsclc/eval/patients.json`
+핵심 문장
+- 실제 ClinicalTrials.gov NSCLC 프로토콜 8건 중 6건을 파싱해 기준 160개를 원문과 대조했습니다.
+- 환자는 전부 합성(80명)입니다. 실제 환자 정보는 없습니다.
+
+| 수치 | 값 | 출처 |
+|---|---|---|
+| 프로토콜 | 8건 (조회 2026-11-02) | `data/nsclc/trials/*.json` `source.retrieved_at` |
+| 파싱 완료 / 미완료 | 6 / 2 (API 크레딧) | `data/nsclc/review/protocol_status.csv` |
+| 기준 (6건 합계) | 160 | `data/nsclc/review/criteria_verification.csv` |
+| 합성 환자 | 80명 | `data/nsclc/eval/patients.json` |
+
 - 라이선스·이용 조건: 확인 필요
 
 ## 슬라이드 2. 축소 범위와 이유
 
-- 범위 안 기준 72개 / 160개
-  - 나이·성별·ECOG 19 (지역 조건부 1 포함)
-  - 범주형 34 (연결 23, 미연결 11)
-  - 임상 판단 기준 19
-  - 출처: `data/nsclc/review/criteria_verification.csv`
-- excluded 9개 (동의서·절차, 팀 결정 2)
-- 범위 밖 79개 (LLM 판정 대상 등, 평가하지 않음)
-- 원문 대조 결과: 일치 60 / 모호 11 / 불일치 1
-  - 불일치 1: "≥22 years of age in the USA" 지역 조건 누락
-  - 출처: `data/nsclc/review/overrides.json`
-- 검사 수치 4개 기준 0건: 6개 시험 원문에 기준값 없음
-  - 출처: `data/nsclc/eval/inputs/lab_reference.json`
-- 이유: 슬롯으로 원문을 다 표현할 수 있는 기준만 정답 계산. 표현 못 하면 미연결
+핵심 문장
+- 슬롯으로 원문을 그대로 표현할 수 있는 기준만 규칙 GT를 계산합니다. 표현할 수 없으면 미연결로 남기고 판정하지 않습니다.
+- 범위 안 72개 기준의 원문 대조 결과: 일치 60 / 모호 11 / 불일치 1
 
-## 슬라이드 3. 독립 규칙 GT 설계
+| 수치 | 값 | 출처 |
+|---|---|---|
+| 범위 안 기준 | 72 / 160 | `criteria_verification.csv` `in_scope` |
+| └ 나이·성별·ECOG | 19 (지역 조건부 1 포함) | 같음 `scope = in_rule_engine` |
+| └ 범주형 | 34 (연결 23, 미연결 11) | 같음 `scope = in_categorical` |
+| └ 임상 판단 기준 | 19 | 같음 `scope = expert` |
+| excluded (동의서·절차, 팀 결정 2) | 9 | 같음 |
+| 범위 밖 (평가하지 않음) | 79 | 같음 |
+| 원문 대조 | 일치 60 / 모호 11 / 불일치 1 ("≥22 years of age in the USA" 지역 조건 누락) | 같음 `result`, `data/nsclc/review/overrides.json` |
+| 검사 수치 기준 | 0건 (6개 시험 원문에 기준값 없음) | `data/nsclc/eval/inputs/lab_reference.json` |
 
-- 생성 / 검토 / 정답 분리
-  - 생성: 생성기 → `data/nsclc/eval/generated/cohort.json`
-  - 검토: 사람 검수표 → `data/nsclc/review/criteria_verification.csv`
-  - 정답: GT 모듈 → `src/ctrec/cohort/gt.py`
-- 엔진 코드 import 0
-  - 출처: `tests/test_nsclc_eval_gt.py` (독립성 테스트 2건)
-- 기준 상태 5종: 통과 / 불통과 / 해당 없음 / 전문가 판단 필요 / 미평가
-- 쌍 라벨 4종: 확정 적격 / 전문가 판단 대기 적격 / 부적격 / 미평가
-- 판정 규칙
-  - 모든 OR 경로 불통과일 때만 부적격
-  - 해당 없음·인구학 기준만 통과는 적격 근거 아님
-  - 지역 조건 불명확 시 미평가
-- 엔진 순환 GT와 일치 237 / 240쌍
-  - 출처: `data/nsclc/eval/checks/circular_vs_independent_4f81460.json`
+## 슬라이드 3. 규칙 GT 설계
 
-## 슬라이드 4. 라벨 분포와 실험 수치
+핵심 문장
+- 생성 / 검토 / GT 계산을 분리했고, GT 코드는 엔진 코드를 import하지 않습니다.
+- 모든 OR 경로가 불통과일 때만 부적격, 지역 조건이 불명확하면 미평가로 둡니다.
 
-- 평가셋 240쌍 (80명 × 3시험, 시드 20261107, 설정 해시 `a549da3b1171fd52`)
-  - 출처: `data/nsclc/eval/manifest.json`
+| 항목 | 내용 | 출처 |
+|---|---|---|
+| 분리 | 생성 `data/nsclc/eval/generated/cohort.json` / 검토 `criteria_verification.csv` / GT `src/ctrec/cohort/gt.py` | |
+| 엔진 import | 0 | `tests/test_nsclc_eval_gt.py` 독립성 테스트 2건 |
+| 기준 상태 | 통과 / 불통과 / 해당 없음 / 전문가 판단 필요 / 미평가 | `rule_gt.csv` |
+| 쌍 라벨 | 확정 적격 / 전문가 판단 대기 적격 / 부적격 / 미평가 | `pair_gt.csv` |
+| 엔진 순환 라벨과의 일치 (비교용, 정답 아님) | 237 / 240쌍 | `data/nsclc/eval/checks/circular_vs_independent_4f81460.json` |
+
+## 슬라이드 4. 라벨 분포
+
+핵심 문장
+- 240쌍 중 전문가 판단 대기 적격 23, 부적격 130, 미평가 87입니다.
+- 확정 적격은 0입니다. 6개 시험 모두 임상 판단 기준이 있어 구조적으로 0입니다.
 
 | 라벨 | 쌍 | 출처 |
 |---|---|---|
-| 확정 적격 | 0 (6개 시험 모두 판단 기준 보유) | `data/nsclc/eval/label_summary.json` |
-| 전문가 판단 대기 적격 | 23 | 같음 |
+| 확정 적격 | 0 | `data/nsclc/eval/label_summary.json` |
+| 전문가 판단 대기 적격 | 23 (9.6%, 설계 목표 10% 미달) | 같음, `generator_config.json` `design_targets` |
 | 부적격 | 130 | 같음 |
 | 미평가 | 87 | 같음 |
 
-- runner 실행 (seed 1, 정책 간 상대 비교 전용)
+- 평가셋: 80명 × 3시험, 기준 시드 20261107, 설정 해시 `a549da3b1171fd52` (`data/nsclc/eval/manifest.json`)
 
-| 정책 · 예산 | 판단 기준 외 확인 완료 ∧ GT 판단 대기 | 확정 부적격 ∧ GT 부적격 | GT 부적격 아님 + 확정 부적격 | 확정 적격 | 출처 |
+## 슬라이드 5. 실행 결과 (입증된 것만)
+
+핵심 문장
+- full_dcvc 한 정책을 6000분·horizon 80·seed 1로 한 번 실행했을 때, 판단 대기 적격 23쌍 중 20쌍이 판단 기준 외 확인을 마치고 담당의 검토 상태에 도달했습니다.
+- 같은 실행에서 거짓 확정은 0입니다(규칙 GT가 부적격이 아닌데 확정 부적격 0, 확정 적격 0).
+- 예산을 400분에서 6000분으로 늘리면 확정 부적격(규칙 GT 부적격과 일치)이 48에서 124로 늘었습니다.
+
+| 정책 · 예산 | 판단 대기 적격 → EXPERT_REVIEW | 확정 부적격 ∧ 규칙 GT 부적격 | 규칙 GT 부적격 아님 + 확정 부적격 | 확정 적격 | 출처 |
 |---|---|---|---|---|---|
-| 기준선(no_action) · 400분 | 0 / 23 | 0 / 130 | 0 | 0 | `data/nsclc/eval/checks/runner_400m_h10_4f81460.json` |
+| no_action(행동 없음 기준점) · 400분 | 0 / 23 | 0 / 130 | 0 | 0 | `data/nsclc/eval/checks/runner_400m_h10_4f81460.json` |
 | full_dcvc · 400분 | 0 / 23 | 48 / 130 | 0 | 0 | 같음 |
-| full_dcvc · 6000분 | 20 / 23 | 124 / 130 | 0 | 0 | `data/nsclc/eval/checks/runner_6000m_h80_4f81460.json` |
+| full_dcvc · 6000분 (`4f81460`) | 20 / 23 | 124 / 130 | 0 | 0 | `data/nsclc/eval/checks/runner_6000m_h80_4f81460.json` |
+| full_dcvc · 6000분 (통합본 `8afe5ea` 재확인) | 20 / 23 | 124 / 130 | 0 | 0 | `docs/dev/final_review_evidence/runner_6000m_h80_8afe5ea_from_demo.json` |
 
-- 결함 발견 사례: 축소 저장소에서 코호트 전용 기준 제거 시 거짓 부적격 6쌍 → 수정 후 0쌍
-  - 출처: `docs/dev/nsclc_eval_dataset.md` §7 D7
+- no_action은 행동을 하지 않는 기준점입니다. 이 표는 DCV·번들링 효과의 근거가 아닙니다(슬라이드 6).
+- 축소 저장소에서 코호트 전용 기준을 빼면 거짓 부적격 6쌍이 생기는 결함을 데이터 단계에서 찾아 고쳤습니다(→ 0쌍). 출처: `docs/dev/nsclc_eval_dataset.md` §7 D7
+- P0 사례 127건 (상충·전해 들은 값 등, 기대값은 원문 처리 원칙으로만 작성): 통합본 `8afe5ea`에서 오채택 36 → 22, 상충 탐지 10/27 → 15/27, 과잉 보류 4 그대로. 근거 확인 함수 단위 측정이며 건수입니다. 출처: `docs/dev/final_review_evidence/p0_fact_cases_8afe5ea_score.md`, branch `data/p0-eval-cases`
 
-## 슬라이드 5. 주장 가능·불가, 한계
+## 슬라이드 6. 한계
 
-주장 가능
-- 실제 프로토콜 기준 72개의 원문 대조 결과
-- 엔진과 분리된 규칙 GT로 정책 결과 대조 가능
-- 이 평가셋·이 조건에서 판단 기준 외 확인 완료 20 / 23쌍, 거짓 확정 0
-- P0 사례 기대값 근거 공개 (상충·전해 들은 값 48건, branch `data/p0-eval-cases` `data/eval/p0_fact_cases/`)
+핵심 문장
+- 합성 데이터·축소 범위·임상 전문가 미검수 상태의 결과이고, 정책 간 상대 비교만 가능합니다.
+- DCV·번들링 효과는 이번 실험 조건에서 차이 없음 또는 역전이라 입증되지 않았습니다. 추가 검증이 필요합니다.
 
-주장 불가
-- 임상 정확도, 임상 성능
-- 전체 프로토콜 적격성 (범위 밖 79개 미평가)
-- 확정 적격 관련 지표 (GT 0건)
-- 검사 수치 기준 처리 (평가셋에 기준 0건)
-- 실제 업무 시간 절감 (비용·응답 확률 가정값)
+| 한계 | 내용 | 출처 |
+|---|---|---|
+| 합성 데이터 | 환자 80명 전부 합성, 사전 분포는 설계값 | `generator_config.json` `design_targets` |
+| 축소 범위 | 160개 중 72개만 판정, 범위 밖 79개 미평가. 전체 프로토콜 적격성 주장 불가 | `criteria_verification.csv` |
+| 임상 전문가 미검수 | 모든 검수표 `clinical_review = 미완료`. 규칙 GT는 임상 판정 결과가 아님 | 같음 |
+| 가정 비용 | 분은 엔진 카탈로그의 가정 비용, 응답 확률도 가정값. 실제 업무 시간 절감 주장 불가 | `docs/dev/p_common_engine_2026_11_07.md` |
+| DCV·번들링 효과 미입증 | no_dcv는 7개 조건 모두 dcvc와 확정 수 같음. no_bundles는 생성기 800분에서 dcvc보다 많음(11.17 vs 8.17, 역전). 구간 추정 없음 | `docs/dev/p_results/*.tsv` (`3e4b2fd`) |
+| 검사 수치 미포함 | 6개 시험 원문에 검사 기준값이 없어 검사 수치 기준 0건. NCT05255302 추가는 후속 과제 (재파싱 없이는 수동 보정 2건 필요, 이번에는 재파싱 안 함) | `lab_reference.json` |
+| 확정 적격 지표 없음 | 규칙 GT 확정 적격 0 | `label_summary.json` |
+| P0 남은 오채택 | 127건 중 22 (같은 항목 다른 값 7, 시점 차이 4, 부정 후 번복 4, 문서 vs 자가보고 서술 4, 다른 사람 값 2, held-out 상충 1) | `p0_fact_cases_8afe5ea_score.md` |
 
-한계
-- 임상 검수 미완료
-  - 출처: 모든 검수표 `clinical_review = 미완료`
-- 합성 환자 사전 분포는 설계값
-  - 출처: `data/nsclc/eval/inputs/generator_config.json` `design_targets`
-- 판단 대기 적격 비율 9.6%, 설계 목표 10% 미달
-- NCT06216301 지역 조건: 현재 엔진에서 20세 거짓 부적격 2케이스
-  - 출처: branch `data/p0-eval-cases` `tests/data/p0_3_region_cases.json`
-- 기존 P0 실패 집합 미해결: 상충 수용 6 / 15, 전해 들은 값 오채택 3 / 10
-  - 출처: branch `data/p0-eval-cases` `data/eval/p0_fact_cases/results/4f81460_score.md`
-- 새 사례: 같은 항목 다른 값 7 / 8 오채택 (전체 127건 중 오채택 36, 과잉 보류 4)
-  - 출처: 같음
-- 검사 수치 기준 미포함, NCT05255302 추가는 후속 과제
-  - 현재 6개 시험 원문에 검사 기준값이 없어 검사 수치 기준 0건
-  - NCT05255302는 재파싱 없이 추가하려면 수동 보정 2건이 필요해 이번 범위에서 제외 (재파싱 안 함)
-  - 출처: `data/nsclc/eval/inputs/lab_reference.json`
+주장하지 않는 것: 임상 정확도·임상 성능, 전체 프로토콜 적격성, 확정 적격 관련 지표, DCV·번들링이 기준선보다 낫다는 주장, 실제 업무 시간 절감.
+
+---
+
+### 이전 초안 대비 바뀐 점
+
+| 항목 | 이전 | 최종 | 사유 |
+|---|---|---|---|
+| GT 표기 | 독립 규칙 GT, 규칙 GT, GT, 정답 | 축소 범위 규칙 GT (임상 전문가 미검수), 줄여서 규칙 GT | 명칭 통일 |
+| 순환 GT | "엔진 순환 GT와 일치" | "엔진 순환 라벨과의 일치 (비교용, 정답 아님)" | 다른 개념과 혼동 방지 |
+| 400분 기준선 행 | "기준선(no_action)" | "no_action(행동 없음 기준점)" + DCV 근거 아님 명시 | 기준선보다 우수로 읽힘 |
+| 20/23 주장 | 조건 짧게 | 정책·예산·horizon·seed·1회 실행 명시, 통합본 재확인 추가 | 근거 범위 명시 |
+| 지역 조건 한계 | "현재 엔진에서 20세 거짓 부적격 2케이스" | 삭제 | 통합본 `8afe5ea`(`5fa4e24`)에서 고쳐짐 |
+| P0 한계 수치 | 오채택 36, 상충 수용 6/15, 전해 들은 값 3/10 | 오채택 22 (통합본) | 최신 채점 |
+| "P0 사례 48건" | 48건 | 127건 | 확장 뒤 수치 |
+| 한계 슬라이드 | 5개 항목 | 합성·축소 범위·미검수·가정 비용·DCV·번들링 미입증·검사 수치 미포함 | 검수 요청 항목 |
