@@ -1,0 +1,30 @@
+HEAD dba06d9d26b1ee5ee653e17375ac5d48903ac521
+C:\Users\jsw58\Desktop\workseoyeon-sy-exp\src\ctrec\__init__.py
+Sun Nov  8 18:11:11     2026
+gt_kind	budget_minutes	arm	runs	verified_eligible	false_eligible	verified_ineligible	false_ineligible	confirmed_unverified	coverage	gt_coverage	unresolved	waiting	unresolved_no_action	actions	assumed_cost_minutes	zero_allocation	allocation_gini	patients_opportunity_missed	rule_gt_circular_disagreements
+synthetic_generator_gt	200.0	no_action	6	0.0	0.0	0.0	0.0	0.0	0.0	0.0	60.0	60.0	0.0	0.0	0.0	20.0	0.0	0.0	0.0
+synthetic_generator_gt	200.0	random	6	0.0	0.0	0.333	0.0	0.0	0.006	0.011	59.667	59.667	0.0	74.5	200.0	0.667	0.21	0.0	0.0
+synthetic_generator_gt	200.0	patient_independent	6	0.0	0.0	0.833	0.0	0.0	0.014	0.028	59.167	59.167	0.0	143.667	200.0	17.0	0.86	0.0	0.0
+synthetic_generator_gt	200.0	cost_first	6	0.0	0.0	0.0	0.0	0.0	0.0	0.0	60.0	60.0	0.0	169.0	200.0	11.667	0.748	0.0	0.0
+synthetic_generator_gt	200.0	dcvc	6	0.0	0.0	4.0	0.0	0.0	0.067	0.137	56.0	56.0	0.0	109.0	199.667	12.0	0.673	0.0	0.0
+synthetic_generator_gt	200.0	dcvc-no_bundles	6	0.0	0.0	3.333	0.0	0.0	0.056	0.114	56.667	56.667	0.0	35.0	200.0	5.333	0.473	0.0	0.0
+synthetic_generator_gt	200.0	dcvc-no_dcv	6	0.0	0.0	4.0	0.0	0.0	0.067	0.137	56.0	56.0	0.0	109.0	199.667	12.0	0.673	0.0	0.0
+synthetic_generator_gt	200.0	dcvc-no_recovery	6	0.0	0.0	4.0	0.0	0.0	0.067	0.137	56.0	54.333	1.667	109.0	199.667	12.0	0.673	0.0	0.0
+synthetic_generator_gt	200.0	dcvc-no_evidence_routing	6	0.0	0.0	4.0	0.0	0.0	0.067	0.137	56.0	56.0	0.0	85.167	199.917	11.667	0.724	0.0	0.0
+synthetic_generator_gt	800.0	no_action	6	0.0	0.0	0.0	0.0	0.0	0.0	0.0	60.0	60.0	0.0	0.0	0.0	20.0	0.0	0.0	0.0
+synthetic_generator_gt	800.0	random	6	0.0	0.0	2.833	0.0	0.0	0.047	0.098	57.167	57.167	0.0	532.667	800.0	0.0	0.103	0.0	0.0
+synthetic_generator_gt	800.0	patient_independent	6	0.0	0.0	1.833	0.0	0.0	0.031	0.063	58.167	58.167	0.0	585.833	800.0	8.0	0.44	0.0	0.0
+synthetic_generator_gt	800.0	cost_first	6	0.0	0.0	0.0	0.0	0.0	0.0	0.0	60.0	60.0	0.0	700.0	800.0	0.0	0.167	0.0	0.0
+synthetic_generator_gt	800.0	dcvc	6	0.0	0.0	5.0	0.0	0.0	0.083	0.172	55.0	54.667	0.333	609.0	799.833	0.0	0.192	0.0	0.0
+synthetic_generator_gt	800.0	dcvc-no_bundles	6	0.0	0.0	8.0	0.0	0.0	0.133	0.271	52.0	52.0	0.0	480.333	800.0	0.0	0.086	0.0	0.0
+synthetic_generator_gt	800.0	dcvc-no_dcv	6	0.0	0.0	5.0	0.0	0.0	0.083	0.172	55.0	54.667	0.333	609.167	799.917	0.0	0.192	0.0	0.0
+synthetic_generator_gt	800.0	dcvc-no_recovery	6	0.0	0.0	5.0	0.0	0.0	0.083	0.172	55.0	39.333	15.667	606.667	798.5	0.0	0.193	0.0	0.0
+synthetic_generator_gt	800.0	dcvc-no_evidence_routing	6	0.0	0.0	4.0	0.0	0.0	0.067	0.137	56.0	56.0	0.0	609.0	800.0	4.0	0.328	0.0	0.0
+# p_suite/0.1: cohorts=['neph-k3-catalog-source-r00@d8c8982c87e0b69a+map7403ddeb', 'neph-k3-catalog-source-r01@d8c8982c87e0b69a+map7403ddeb', 'neph-k3-catalog-source-r02@d8c8982c87e0b69a+map7403ddeb'], gt=['synthetic_generator_gt'], seeds=[1, 2], horizon=10
+# 비용: relative_policy_comparison_only (가정 비용 정보원 ['clinician_review', 'lab_report', 'medical_record', 'medication_list', 'pathology_report', 'patient_interview', 'trial_registry'])
+# 정확도 칸(verified_*/false_*)은 독립 합성 GT 기준이며 임상 GT가 아님. '-' = 독립 GT 없음(미검증). rule_gt_circular_disagreements는 같은 평가기의 순환 라벨과의 일관성 검사.
+
+real	45m5.340s
+user	0m0.000s
+sys	0m0.015s
+Sun Nov  8 18:56:16     2026

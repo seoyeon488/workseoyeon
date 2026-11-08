@@ -1,0 +1,31 @@
+HEAD dba06d9d26b1ee5ee653e17375ac5d48903ac521
+C:\Users\jsw58\Desktop\workseoyeon-sy-exp\src\ctrec\__init__.py
+Sun Nov  8 20:02:19     2026
+{"head": "dba06d9d26b1ee5ee653e17375ac5d48903ac521", "ctrec": "C:\\Users\\jsw58\\Desktop\\workseoyeon-sy-exp\\src\\ctrec\\__init__.py", "cohort": "nsclc", "budget": 90, "seed": 1, "arm": "dcvc", "diag
+{"head": "dba06d9d26b1ee5ee653e17375ac5d48903ac521", "ctrec": "C:\\Users\\jsw58\\Desktop\\workseoyeon-sy-exp\\src\\ctrec\\__init__.py", "cohort": "nsclc", "budget": 90, "seed": 1, "arm": "no_bundles",
+{"head": "dba06d9d26b1ee5ee653e17375ac5d48903ac521", "ctrec": "C:\\Users\\jsw58\\Desktop\\workseoyeon-sy-exp\\src\\ctrec\\__init__.py", "cohort": "nsclc", "budget": 400, "seed": 1, "arm": "dcvc", "dia
+{"head": "dba06d9d26b1ee5ee653e17375ac5d48903ac521", "ctrec": "C:\\Users\\jsw58\\Desktop\\workseoyeon-sy-exp\\src\\ctrec\\__init__.py", "cohort": "nsclc", "budget": 400, "seed": 1, "arm": "no_bundles"
+{"head": "dba06d9d26b1ee5ee653e17375ac5d48903ac521", "ctrec": "C:\\Users\\jsw58\\Desktop\\workseoyeon-sy-exp\\src\\ctrec\\__init__.py", "cohort": "gen0", "budget": 800, "seed": 1, "arm": "dcvc", "diag
+{"head": "dba06d9d26b1ee5ee653e17375ac5d48903ac521", "ctrec": "C:\\Users\\jsw58\\Desktop\\workseoyeon-sy-exp\\src\\ctrec\\__init__.py", "cohort": "gen0", "budget": 800, "seed": 1, "arm": "no_bundles",
+Sun Nov  8 20:04:53     2026
+PROBE2_DONE
+{"arm": "random", "budget": 90, "K": 1, "horizon": 80, "CI": 0, "CE": 0, "VI": 0, "FI": 0, "unresolved": 48, "noact": 0, "actions": 19, "cost": 89.5, "zero": 0, "gini": 0.259078, "rounds": 4, "termination": "budget_exhausted", "hash": "e767cb1a2ecaad01"}
+{"arm": "dcvc", "budget": 90, "K": 1, "horizon": 80, "CI": 8, "CE": 0, "VI": 8, "FI": 0, "unresolved": 40, "noact": 0, "actions": 39, "cost": 90.0, "zero": 1, "gini": 0.705556, "rounds": 33, "termination": "budget_exhausted", "hash": "4e75008c1b8967a3"}
+{"arm": "dcvc-no_bundles", "budget": 90, "K": 1, "horizon": 80, "CI": 4, "CE": 0, "VI": 4, "FI": 0, "unresolved": 44, "noact": 0, "actions": 22, "cost": 90.0, "zero": 0, "gini": 0.383333, "rounds": 6, "termination": "budget_exhausted", "hash": "5a67e0e7d5a897d6"}
+{"arm": "dcvc-no_dcv", "budget": 90, "K": 1, "horizon": 80, "CI": 8, "CE": 0, "VI": 8, "FI": 0, "unresolved": 40, "noact": 0, "actions": 39, "cost": 90.0, "zero": 1, "gini": 0.705556, "rounds": 33, "termination": "budget_exhausted", "hash": "c179848244e6f2f3"}
+{"arm": "dcvc-no_evidence_routing", "budget": 90, "K": 1, "horizon": 80, "CI": 4, "CE": 0, "VI": 4, "FI": 0, "unresolved": 44, "noact": 0, "actions": 47, "cost": 89.0, "zero": 5, "gini": 0.731742, "rounds": 45, "termination": "budget_exhausted", "hash": "12f25ed5e00dfcf8"}
+{"arm": "random", "budget": 400, "K": 1, "horizon": 80, "CI": 0, "CE": 0, "VI": 0, "FI": 0, "unresolved": 48, "noact": 0, "actions": 157, "cost": 400.0, "zero": 0, "gini": 0.075312, "rounds": 27, "termination": "budget_exhausted", "hash": "e629f6c8ff1afecf"}
+{"arm": "dcvc", "budget": 400, "K": 1, "horizon": 80, "CI": 8, "CE": 0, "VI": 8, "FI": 0, "unresolved": 40, "noact": 0, "actions": 278, "cost": 378.0, "zero": 0, "gini": 0.29332, "rounds": 80, "termination": "horizon_reached", "hash": "a01b9c9ea6ffac97"}
+{"arm": "dcvc-no_bundles", "budget": 400, "K": 1, "horizon": 80, "CI": 14, "CE": 0, "VI": 14, "FI": 0, "unresolved": 34, "noact": 1, "actions": 122, "cost": 400.0, "zero": 0, "gini": 0.166875, "rounds": 26, "termination": "budget_exhausted", "hash": "a611004c72c6a132"}
+{"arm": "dcvc-no_dcv", "budget": 400, "K": 1, "horizon": 80, "CI": 8, "CE": 0, "VI": 8, "FI": 0, "unresolved": 40, "noact": 0, "actions": 282, "cost": 382.0, "zero": 0, "gini": 0.28534, "rounds": 80, "termination": "horizon_reached", "hash": "eb8dd5cca84cb385"}
+{"arm": "dcvc-no_evidence_routing", "budget": 400, "K": 1, "horizon": 80, "CI": 2, "CE": 0, "VI": 2, "FI": 0, "unresolved": 46, "noact": 0, "actions": 225, "cost": 347.0, "zero": 0, "gini": 0.425432, "rounds": 80, "termination": "horizon_reached", "hash": "2db5791ca86ff0fb"}
+Sun Nov  8 20:14:08     2026
+CAP_NSCLC_DONE
+{"arm": "dcvc", "budget": 200, "K": 2, "horizon": 80, "CI": 2, "CE": 0, "VI": 2, "FI": 0, "unresolved": 58, "noact": 0, "actions": 76, "cost": 199.0, "zero": 12, "gini": 0.665075, "rounds": 11, "termination": "budget_exhausted", "hash": "ac2dd27ce16f8645"}
+{"arm": "dcvc-no_bundles", "budget": 200, "K": 2, "horizon": 80, "CI": 2, "CE": 0, "VI": 2, "FI": 0, "unresolved": 58, "noact": 0, "actions": 36, "cost": 200.0, "zero": 6, "gini": 0.5015, "rounds": 3, "termination": "budget_exhausted", "hash": "bdef5b34108b8835"}
+{"arm": "dcvc-no_dcv", "budget": 200, "K": 2, "horizon": 80, "CI": 2, "CE": 0, "VI": 2, "FI": 0, "unresolved": 58, "noact": 0, "actions": 77, "cost": 200.0, "zero": 12, "gini": 0.6665, "rounds": 11, "termination": "budget_exhausted", "hash": "1a03ae299bb90394"}
+{"arm": "dcvc", "budget": 800, "K": 2, "horizon": 80, "CI": 2, "CE": 0, "VI": 2, "FI": 0, "unresolved": 58, "noact": 9, "actions": 518, "cost": 798.5, "zero": 0, "gini": 0.255949, "rounds": 30, "termination": "budget_exhausted", "hash": "716e6e8704bf1086"}
+{"arm": "dcvc-no_bundles", "budget": 800, "K": 2, "horizon": 80, "CI": 5, "CE": 0, "VI": 5, "FI": 0, "unresolved": 55, "noact": 2, "actions": 403, "cost": 800.0, "zero": 0, "gini": 0.176875, "rounds": 17, "termination": "budget_exhausted", "hash": "9e6c02dc52a612a0"}
+{"arm": "dcvc-no_dcv", "budget": 800, "K": 2, "horizon": 80, "CI": 2, "CE": 0, "VI": 2, "FI": 0, "unresolved": 58, "noact": 9, "actions": 525, "cost": 800.0, "zero": 0, "gini": 0.257937, "rounds": 30, "termination": "budget_exhausted", "hash": "87de974447775ad0"}
+Sun Nov  8 20:17:34     2026
+QUEUE2_DONE

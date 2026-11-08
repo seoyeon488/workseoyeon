@@ -1,0 +1,1840 @@
+{
+ "head": "dba06d9d26b1ee5ee653e17375ac5d48903ac521",
+ "ctrec": "C:\\Users\\jsw58\\Desktop\\workseoyeon-sy-exp\\src\\ctrec\\__init__.py",
+ "cohort": "nsclc",
+ "budget": 400,
+ "seed": 1,
+ "arm": "no_bundles",
+ "diagnostic": false,
+ "result_hash": "4b9068635febfa69",
+ "CI": 14,
+ "CE": 0,
+ "gini": 0.0,
+ "cost": 400.0,
+ "actions_executed": 118,
+ "rounds": [
+  {
+   "proposed_filter_off": 971,
+   "proposed_filter_on": 971,
+   "removed": 0,
+   "removed_exec": 0,
+   "removed_impact_max": null,
+   "kept_exec": 963,
+   "kept_exec_zero_impact": 0,
+   "removed_min_cost": null,
+   "selected": 112,
+   "skipped_over_budget": 851,
+   "plan_cost": 400.0
+  },
+  {
+   "proposed_filter_off": 963,
+   "proposed_filter_on": 690,
+   "removed": 273,
+   "removed_exec": 273,
+   "removed_impact_max": 0.0,
+   "kept_exec": 682,
+   "kept_exec_zero_impact": 2,
+   "removed_min_cost": 5.0,
+   "selected": 6,
+   "skipped_over_budget": 676,
+   "plan_cost": 400.0
+  },
+  {
+   "proposed_filter_off": 963,
+   "proposed_filter_on": 690,
+   "removed": 273,
+   "removed_exec": 273,
+   "removed_impact_max": 0.0,
+   "kept_exec": 682,
+   "kept_exec_zero_impact": 2,
+   "removed_min_cost": 5.0,
+   "selected": 0,
+   "skipped_over_budget": 676,
+   "plan_cost": 400.0
+  }
+ ],
+ "sum_removed": 546,
+ "sum_removed_exec": 546,
+ "sum_kept_zero_impact": 4,
+ "per_patient_minutes": {
+  "PA-0b243d6ae1108619": 50.0,
+  "PA-15e15f2b921b50fd": 50.0,
+  "PA-5aa2fd02e2e10c30": 50.0,
+  "PA-9a258d3300b03354": 50.0,
+  "PA-a093eae15b5f7e88": 50.0,
+  "PA-ba86c5f35882ff23": 50.0,
+  "PA-ca77658206dae94a": 50.0,
+  "PA-f3d6a299653fa830": 50.0
+ },
+ "patients_with_minutes": 8,
+ "actions_per_patient": {
+  "PA-15e15f2b921b50fd": 15,
+  "PA-9a258d3300b03354": 15,
+  "PA-a093eae15b5f7e88": 15,
+  "PA-ca77658206dae94a": 15,
+  "PA-f3d6a299653fa830": 15,
+  "PA-5aa2fd02e2e10c30": 14,
+  "PA-ba86c5f35882ff23": 14,
+  "PA-0b243d6ae1108619": 15
+ },
+ "actions_by_source": {
+  "medical_record": 10,
+  "pathology_report": 8,
+  "patient_interview": 88,
+  "clinician_review": 12
+ },
+ "actions_by_type": {
+  "REQUEST_DOCUMENT": 18,
+  "ASK_PATIENT": 88,
+  "CLINICIAN_REVIEW": 12
+ },
+ "distinct_patient_source": 30,
+ "repeat_contacts": 88,
+ "max_actions_one_patient_source": 11,
+ "executed_zero_open_targets": 30,
+ "executed_zero_open_targets_before": 27,
+ "executed": [
+  {
+   "open_targets_before": 6,
+   "round": 1,
+   "open_targets": 6,
+   "impact": 0.34668106691867107,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "medical_record",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "succeeded",
+   "trials": [
+    "NCT06216301",
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 6,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "medical_record",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "succeeded",
+   "trials": [
+    "NCT06216301",
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 6,
+   "round": 1,
+   "open_targets": 6,
+   "impact": 0.34668106691867107,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "medical_record",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "succeeded",
+   "trials": [
+    "NCT06216301",
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 6,
+   "round": 1,
+   "open_targets": 6,
+   "impact": 0.34668106691867107,
+   "patient": "PA-ca77658206dae94a",
+   "source": "medical_record",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "succeeded",
+   "trials": [
+    "NCT06216301",
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 6,
+   "round": 1,
+   "open_targets": 6,
+   "impact": 0.3448694727157725,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "medical_record",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "succeeded",
+   "trials": [
+    "NCT06216301",
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 6,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "medical_record",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "succeeded",
+   "trials": [
+    "NCT06216301",
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 6,
+   "round": 1,
+   "open_targets": 6,
+   "impact": 0.34668106691867107,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "medical_record",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "succeeded",
+   "trials": [
+    "NCT06216301",
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.1111111111111111,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "pathology_report",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.05555555555555555,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "failed",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.05555555555555555,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.05555555555555555,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.05555555555555555,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.05555555555555555,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.05555555555555555,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "failed",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.05555555555555555,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.05555555555555555,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.05555555555555555,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "failed",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.1111111111111111,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.1111111111111111,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "pathology_report",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "pathology_report",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "failed",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "pathology_report",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "pathology_report",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "pathology_report",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-ca77658206dae94a",
+   "source": "pathology_report",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ca77658206dae94a",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ca77658206dae94a",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ca77658206dae94a",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ca77658206dae94a",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ca77658206dae94a",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ca77658206dae94a",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ca77658206dae94a",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ca77658206dae94a",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ca77658206dae94a",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-ca77658206dae94a",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-ca77658206dae94a",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "pathology_report",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "record_evidence_required",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.125,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_required_info",
+   "status": "no_response",
+   "trials": [
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 6,
+   "round": 1,
+   "open_targets": 6,
+   "impact": 0.34668106691867107,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "medical_record",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "unverified_self_report",
+   "status": "succeeded",
+   "trials": [
+    "NCT06216301",
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 5,
+   "round": 1,
+   "open_targets": 5,
+   "impact": 0.3032028060491059,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "clinician_review",
+   "type": "CLINICIAN_REVIEW",
+   "reason": "criterion_underspecified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 5,
+   "round": 1,
+   "open_targets": 5,
+   "impact": 0.3032028060491059,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "clinician_review",
+   "type": "CLINICIAN_REVIEW",
+   "reason": "criterion_underspecified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "clinician_review",
+   "type": "CLINICIAN_REVIEW",
+   "reason": "criterion_underspecified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 5,
+   "round": 1,
+   "open_targets": 5,
+   "impact": 0.3032028060491059,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "clinician_review",
+   "type": "CLINICIAN_REVIEW",
+   "reason": "criterion_underspecified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 5,
+   "round": 1,
+   "open_targets": 5,
+   "impact": 0.3032028060491059,
+   "patient": "PA-ca77658206dae94a",
+   "source": "clinician_review",
+   "type": "CLINICIAN_REVIEW",
+   "reason": "criterion_underspecified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 5,
+   "round": 1,
+   "open_targets": 5,
+   "impact": 0.3032028060491059,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "clinician_review",
+   "type": "CLINICIAN_REVIEW",
+   "reason": "criterion_underspecified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 1,
+   "round": 1,
+   "open_targets": 1,
+   "impact": 0.058823529411764705,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "patient_interview",
+   "type": "ASK_PATIENT",
+   "reason": "missing_optional_info",
+   "status": "no_response",
+   "trials": [
+    "NCT06928389"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-5aa2fd02e2e10c30",
+   "source": "medical_record",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "exclusion_basis_unverified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07416058"
+   ]
+  },
+  {
+   "open_targets_before": 2,
+   "round": 1,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-ba86c5f35882ff23",
+   "source": "medical_record",
+   "type": "REQUEST_DOCUMENT",
+   "reason": "exclusion_basis_unverified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07416058"
+   ]
+  },
+  {
+   "open_targets_before": 5,
+   "round": 2,
+   "open_targets": 5,
+   "impact": 0.3032028060491059,
+   "patient": "PA-0b243d6ae1108619",
+   "source": "clinician_review",
+   "type": "CLINICIAN_REVIEW",
+   "reason": "criterion_underspecified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 5,
+   "round": 2,
+   "open_targets": 5,
+   "impact": 0.3032028060491059,
+   "patient": "PA-15e15f2b921b50fd",
+   "source": "clinician_review",
+   "type": "CLINICIAN_REVIEW",
+   "reason": "criterion_underspecified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 5,
+   "round": 2,
+   "open_targets": 5,
+   "impact": 0.3032028060491059,
+   "patient": "PA-a093eae15b5f7e88",
+   "source": "clinician_review",
+   "type": "CLINICIAN_REVIEW",
+   "reason": "criterion_underspecified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 5,
+   "round": 2,
+   "open_targets": 5,
+   "impact": 0.3032028060491059,
+   "patient": "PA-ca77658206dae94a",
+   "source": "clinician_review",
+   "type": "CLINICIAN_REVIEW",
+   "reason": "criterion_underspecified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 5,
+   "round": 2,
+   "open_targets": 5,
+   "impact": 0.3032028060491059,
+   "patient": "PA-f3d6a299653fa830",
+   "source": "clinician_review",
+   "type": "CLINICIAN_REVIEW",
+   "reason": "criterion_underspecified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  },
+  {
+   "open_targets_before": 0,
+   "round": 2,
+   "open_targets": 0,
+   "impact": 0.0,
+   "patient": "PA-9a258d3300b03354",
+   "source": "clinician_review",
+   "type": "CLINICIAN_REVIEW",
+   "reason": "criterion_underspecified",
+   "status": "succeeded",
+   "trials": [
+    "NCT06928389",
+    "NCT07027514",
+    "NCT07098338",
+    "NCT07416058",
+    "NCT07680790"
+   ]
+  }
+ ]
+}

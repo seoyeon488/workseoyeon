@@ -1,0 +1,424 @@
+{
+ "row": {
+  "cohort": "neph-k3-catalog-source-r02@d8c8982c87e0b69a+map7403ddeb",
+  "cohort_index": 2,
+  "gt_kind": "synthetic_generator_gt",
+  "arm": "dcvc-no_evidence_routing",
+  "policy_id": "full_dcvc",
+  "policy_config": {
+   "evidence_routing": false
+  },
+  "budget_minutes": 200.0,
+  "seed": 1,
+  "result_hash": "e3b13620af380997",
+  "pairs": 60,
+  "system_confirmed_eligible": 0,
+  "system_confirmed_ineligible": 0,
+  "coverage": 0.0,
+  "unresolved": 60,
+  "waiting": 60,
+  "unresolved_no_action": 0,
+  "unresolved_by_status": {
+   "VERIFICATION_PENDING": 11,
+   "INFO_MISSING": 49
+  },
+  "actions": 65,
+  "questions": 51,
+  "document_requests": 14,
+  "assumed_cost_minutes": 199.5,
+  "assumed_clinician_minutes": 0.0,
+  "rule_gt_circular_disagreements": 0,
+  "termination": "budget_exhausted",
+  "verified_eligible": 0,
+  "false_eligible": 0,
+  "verified_ineligible": 0,
+  "false_ineligible": 0,
+  "confirmed_unverified": 0,
+  "gt_eligible": 0,
+  "gt_labeled": 32,
+  "gt_coverage": 0.0,
+  "fairness": {
+   "patients_needing": 20,
+   "zero_allocation": 10,
+   "allocation_gini": 0.664035,
+   "max_questions_per_patient": 46,
+   "patients_with_gt_opportunity": 0,
+   "patients_opportunity_missed": 0
+  }
+ },
+ "per_patient": {
+  "PA-014563f0f629e20c": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "VERIFICATION_PENDING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 63.5
+  },
+  "PA-0c72b5e57b06dd2f": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "VERIFICATION_PENDING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 26.0
+  },
+  "PA-0db3dd906fdaaaff": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "VERIFICATION_PENDING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 16.0
+  },
+  "PA-1a2bbab5776d3883": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "VERIFICATION_PENDING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 6.5
+  },
+  "PA-2256ecad4ee5878d": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "VERIFICATION_PENDING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 6.5
+  },
+  "PA-3e2a25a8a24f64a7": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "VERIFICATION_PENDING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 16.0
+  },
+  "PA-49ff15281e86ea89": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "VERIFICATION_PENDING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 16.0
+  },
+  "PA-507b487e3d538617": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "VERIFICATION_PENDING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 16.0
+  },
+  "PA-65a8f8213a7d72ce": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "VERIFICATION_PENDING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "VERIFICATION_PENDING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 17.0
+  },
+  "PA-83ddcf8a3f6b3cbe": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 0.0
+  },
+  "PA-97a652e42ec49dac": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 0.0
+  },
+  "PA-a933ae76c2fb1962": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 0.0
+  },
+  "PA-b03fd26f6a1bff6e": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 0.0
+  },
+  "PA-b0c4b1066809741d": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 0.0
+  },
+  "PA-b2d088194e315d4d": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 0.0
+  },
+  "PA-b83cae8991c03b88": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 0.0
+  },
+  "PA-c4417628326f1e5e": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 0.0
+  },
+  "PA-c48dd1a25ef9d4c1": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 0.0
+  },
+  "PA-c738faa73267f9cc": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "VERIFICATION_PENDING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 16.0
+  },
+  "PA-d4f0139acdb021d8": {
+   "opportunities": [],
+   "confirmed_ineligible": [],
+   "waiting": {
+    "NCT06125405": "INFO_MISSING",
+    "NCT06530004": "INFO_MISSING",
+    "NCT07087314": "INFO_MISSING"
+   },
+   "unresolved": {},
+   "coordinator_minutes": 0.0
+  }
+ },
+ "status_initial": {
+  "CONFIRMED_ELIGIBLE": 0,
+  "CONFIRMED_INELIGIBLE": 0,
+  "VERIFICATION_PENDING": 11,
+  "INFO_MISSING": 49,
+  "EXPERT_REVIEW": 0,
+  "BLOCKED_FAILURE": 0,
+  "NOT_EVALUATED": 0
+ },
+ "initial_open_pairs": {
+  "PA-014563f0f629e20c": 3,
+  "PA-0c72b5e57b06dd2f": 3,
+  "PA-0db3dd906fdaaaff": 3,
+  "PA-1a2bbab5776d3883": 3,
+  "PA-2256ecad4ee5878d": 3,
+  "PA-3e2a25a8a24f64a7": 3,
+  "PA-49ff15281e86ea89": 3,
+  "PA-507b487e3d538617": 3,
+  "PA-65a8f8213a7d72ce": 3,
+  "PA-83ddcf8a3f6b3cbe": 3,
+  "PA-97a652e42ec49dac": 3,
+  "PA-a933ae76c2fb1962": 3,
+  "PA-b03fd26f6a1bff6e": 3,
+  "PA-b0c4b1066809741d": 3,
+  "PA-b2d088194e315d4d": 3,
+  "PA-b83cae8991c03b88": 3,
+  "PA-c4417628326f1e5e": 3,
+  "PA-c48dd1a25ef9d4c1": 3,
+  "PA-c738faa73267f9cc": 3,
+  "PA-d4f0139acdb021d8": 3
+ },
+ "manifest": {
+  "runner_version": "wp6_runner/0.1",
+  "run_id": "sim-b3db9de349a091be",
+  "spec": {
+   "experiment_id": "p-dcvc-no_evidence_routing-200-1",
+   "policy_id": "full_dcvc",
+   "policy_version": "0.2-draft",
+   "policy_config": {
+    "evidence_routing": false
+   },
+   "data_version": {
+    "frozen_store_hash": "463d074b3364a7f2",
+    "cohort_hash": "9ff91725eef5ec67",
+    "source_catalog_hash": "9474a4b25296fecf"
+   },
+   "seed": 1,
+   "budget": {
+    "coordinator_minutes": 200.0,
+    "clinician_minutes": 60.0,
+    "llm_cost_usd": null,
+    "per_patient_floor_minutes": 0.0,
+    "per_patient_cap_minutes": null,
+    "horizon_steps": 10
+   },
+   "ablations": [],
+   "contract_version": "dcvc.engine.contracts/0.2"
+  },
+  "spec_hash": "b3db9de349a091be",
+  "result_hash": "e3b13620af380997",
+  "contract_version": "dcvc.engine.contracts/0.2",
+  "catalog_claims": {
+   "catalog_hash": "9474a4b25296fecf",
+   "assumed_cost_sources": [
+    "clinician_review",
+    "lab_report",
+    "medical_record",
+    "medication_list",
+    "pathology_report",
+    "patient_interview",
+    "trial_registry"
+   ],
+   "absolute_time_claims_allowed": false,
+   "allowed_claims": "relative_policy_comparison_only"
+  },
+  "claims": "synthetic_relative_comparison_only",
+  "document_authority": {
+   "authority": "SimDocumentAuthority",
+   "kind": "synthetic",
+   "assumes": "future_server_document_contract",
+   "production_authority": "NoDocumentAuthority",
+   "operational_performance": false
+  },
+  "cohort": {
+   "cohort_id": "neph-k3-catalog-source-r02@d8c8982c87e0b69a+map7403ddeb",
+   "cohort_hash": "9ff91725eef5ec67",
+   "store_hash": "463d074b3364a7f2",
+   "patients": 20,
+   "trials": 3
+  },
+  "evaluator": {
+   "id": "matcher_rule_scope_offline/0.1+categorical_judge/0.2",
+   "scope": "rule_engine_plus_categorical_judge_upper_bound",
+   "judge_digest": "3b9a3997fbac9870",
+   "judge_include_draft": false,
+   "ground_truth": "rule_gt_circular",
+   "ground_truth_hash": "846cb3a496ed47ce"
+  },
+  "response_model": {
+   "basis": "assumed",
+   "seed": 1,
+   "responses": {
+    "clinician": {
+     "p_unreachable": 0.0,
+     "p_no_answer": 0.0,
+     "p_no_answer_rephrased": null,
+     "latency_scale": [
+      0.5,
+      1.5
+     ]
+    },
+    "document": {
+     "p_unreachable": 0.1,
+     "p_no_answer": 0.0,
+     "p_no_answer_rephrased": null,
+     "latency_scale": [
+      0.5,
+      1.5
+     ]
+    },
+    "patient": {
+     "p_unreachable": 0.05,
+     "p_no_answer": 0.2,
+     "p_no_answer_rephrased": 0.1,
+     "latency_scale": [
+      0.5,
+      1.5
+     ]
+    },
+    "system": {
+     "p_unreachable": 0.0,
+     "p_no_answer": 0.0,
+     "p_no_answer_rephrased": null,
+     "latency_scale": [
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "hash": "e35a053409e0db2f"
+  },
+  "rephrase": false,
+  "llm": {
+   "real_calls": 0,
+   "offline_matcher_requests": 129
+  },
+  "environment": {
+   "python": "3.10.11",
+   "platform": "Windows-10-10.0.26300-SP0",
+   "commit": "dba06d9d26b1ee5ee653e17375ac5d48903ac521"
+  },
+  "reference_policy": false
+ }
+}
