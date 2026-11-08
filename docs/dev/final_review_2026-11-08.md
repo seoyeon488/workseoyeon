@@ -3,6 +3,15 @@
 작성: 서연 · 기준: 선우 통합본 `urgent/integration` `8afe5ea` (2026-11-08 20:50) · 검수 범위: 읽기 + 허용된 확인 실행(P0 채점, 데모 A~D 재확인)
 > **데이터 검증 완료 / 임상 검수 미완료.** GT는 축소 범위 규칙 GT (임상 전문가 미검수). 정확도·성능 향상 표현을 쓰지 않습니다. 실험(정책 비교·ablation)은 다시 돌리지 않았고, 코드·GT 라벨·데이터는 바꾸지 않았습니다.
 
+## 최종 통합 브랜치 대조 요약 (23시, `integration/phase1-final` `b1d2a7f` → 9절)
+
+| 항목 | 결과 |
+|---|---|
+| 누락 | **4건** (모두 내 문서 브랜치의 21시 이후 커밋: `eba0fc6`·`4fbe82b`의 presentation 최종본·demo_final_flow·final_review·근거 파일). 코드·데이터·테스트·결정 5 패치·P0 사례는 모두 포함 |
+| 수치 변경 | **없음.** 240쌍 400분 47, 6000분 20/23·124/130, 거짓 확정 0, 라벨 0/23/130/87, 설정 해시 `a549da3b1171fd52`, P0 22/127 모두 `8afe5ea`와 같음 (400분 result_hash도 같음) |
+| 전체 테스트 | **6,254 passed / 0 failed / 9 skipped / 4 xfailed** (32분) |
+| 문서 정정 | C(P058) "처방 목록으로 확보"는 오류 (새 사실 0) → 고침. B는 통합본과 같이 P052, P045는 대체안 |
+
 ## 최신 갱신 요약 (22시, 선우 `dba06d9` 재실험 보고서 대조 → 8절)
 
 | 항목 | 결과 |
@@ -211,7 +220,7 @@ NSCLC 파일럿 (`sim-nsclc-pilot-8x6`, 48쌍, 작성자 판독 부적격 라벨
 | W3 | S003 (7세) · 가상 T-A~D | 자기 보고 나이 불충족 → 나이 근거 서류 요청 유지 → 확인 | T-A~D 참여 불가(확정) | 같음 | 같음, 동겸 기록 `d20cc0d` |
 | A | P052 × NCT07680790 | ECOG 진료기록 → EGFR 병리 결과지 | EXPERT_REVIEW | EXPERT_REVIEW | 오프라인 runner, `8afe5ea` 재확인 |
 | B | P045 × NCT06928389 | 자기 보고 ECOG 2 → 진료기록 확인 | CONFIRMED_INELIGIBLE | CONFIRMED_INELIGIBLE | 같음 |
-| C | P058 × NCT07416058 (P061에서 교체) | I6 "모름" → 처방 목록 | INFO_MISSING | INFO_MISSING | 같음 |
+| C | P058 × NCT07416058 (P061에서 교체) | I6 "모름" → 투약 목록 요청 처리됨, **새 사실 0** (23시 정정) | INFO_MISSING | INFO_MISSING | 같음 |
 | D | DEMO-REGION × NCT06216301 | 20세·국가 미상 | 확정하지 않음 | **INFO_MISSING** (4f81460에서는 CONFIRMED_INELIGIBLE) | 오프라인 판정기 |
 
 - W1~W3 실제 결과는 동겸 기록이며 이번에 브라우저로 다시 확인하지 않았습니다. W1 기록은 담당자 화면 개편(`721fcf7`·`1e47a71`)·보류 표시 변경(`4dcf8ae`) 이전이라 통합본에서 리허설 확인이 필요합니다.
@@ -368,6 +377,69 @@ NSCLC 파일럿 (`sim-nsclc-pilot-8x6`, 48쌍, 작성자 판독 부적격 라벨
 | X9 | 04 §2.2 | "작은 예산에서는 집중이 유리합니다" | 번들링 이득 주장으로 읽힘. 인과 미확인(생성기 800분 inconclusive) |
 
 발표에서 쓸 수 있는 선우 보고서 문장 (조건 포함 그대로): "no_dcv는 현재 실행 모델에서 측정 도구로 무효", "큰 예산에서는 번들 할인을 끈 쪽이 더 높다", "어떤 수치도 임상 정확도가 아니다", "적격 GT가 없어 FE 0은 안전성 증거가 아니다".
+
+## 9. 최종 통합 브랜치 대조 — `integration/phase1-final` `b1d2a7f` (2026-11-08 21:36, 선우)
+
+통합 브랜치는 수정·push하지 않았습니다. 별도 worktree에서 읽기·허용된 실행만 했습니다(240쌍 runner 단일 실행 3개, P0 채점, 평가셋 재생성·테스트, 전체 테스트).
+
+### 9-1. 포함 여부
+
+| 항목 | 상태 | 근거 커밋 (phase1-final) |
+|---|---|---|
+| #43 `gt.py`, `data/nsclc/eval`, `data/nsclc/review`, `scripts/build_nsclc_eval.py`, `tests/test_nsclc_eval_gt.py` | 포함 | `ade22d8`~`c3cc3d5` (#43, 8afe5ea 경유) |
+| 결정 5 board 테스트 (`moved == {"NCT07087314": 1}`) | 포함 | `c076add` (feat/nsclc-eval-gt-decision5-patches, #46 경유) |
+| 결정 5 sim_expert_metric (`from ..cohort.spec import EXPERT_SLOTS`) | 포함 | 같음 + 동겸 #46 테스트 "같은 객체" |
+| 결정 5 recovery_stress (16·24) | 포함 | 같음 |
+| `cohort.spec.EXPERT_SLOTS` 8개 (CSV 6 + EXTRA 2) | 포함 | `spec.py:28-31` |
+| P0 사례 127건 (값 82·서술 20·held-out 25), `score_p0_fact_cases.py`, 오프라인 어댑터 | 포함 | `3ee3e7d`·`0bec65b`·`53ab2de` (data/p0-eval-cases 재작성 커밋) |
+| P0-3 회귀 케이스 | 포함 | `1de0f6d` |
+| xfail 해제 (known_defect 2건 false) | 포함 (내 패치 파일 대신 같은 내용을 선우가 커밋) | `60d7921` |
+| P0 phase1-final 채점 결과 | 포함 | `4606c58` |
+| 내 `nsclc_eval_dataset.md` | **부분** — K판(`2172892`)까지. 21시 GT 명칭 통일(`eba0fc6`) 누락 | |
+| 내 `presentation_data_gt.md` | **부분** — `70fe9a5`판(`179b339`, 48·지역 결함 문장·3e4b2fd ablation 포함) + 선우 15줄 추가. 21시 최종본(`eba0fc6`)·22시 dba06d9 대조판(`4fbe82b`) 누락 | |
+| 내 `demo_final_flow.md` | **누락** | |
+| 내 `final_review_2026-11-08.md`, `final_review_evidence/`, `final_review_scripts/` | **누락** | |
+| `demo_nsclc_scenarios.md` | 선우 갱신본으로 대체 (`fa07b65`·`3eecd50`, B=P052, C=P058). 내 21시판(`eba0fc6`)은 들어가지 않음 — 통합본 판이 더 정확해 그대로 두는 것 권장 | |
+| `docs/dev/final_review_evidence/phase1_final_runs.json`, `final_review_scripts/run_one_policy.py` | 23시: phase1-final runner 3개·테스트·재생성 결과 |
+| `docs/proposals/p0_3_xfail_release.patch` | 누락 (불필요: `60d7921`로 반영됨) | |
+
+### 9-2. 수치 재확인
+
+| 항목 | 슬라이드 값 (8afe5ea) | phase1-final 값 | 일치 |
+|---|---|---|---|
+| 전체 테스트 | – | 6,254 passed / 0 failed / 9 skipped / 4 xfailed | – (8afe5ea 전체 테스트는 돌리지 않음) |
+| `tests/test_nsclc_eval_gt.py`·`tests/test_p0_3_region_cases.py` | 20 passed · 13 passed(해제 패치 적용 시) | 전체 테스트 안에서 통과 (실패 0) | 일치 |
+| 평가셋 설정 해시 | `a549da3b1171fd52` | 재생성 `a549da3b1171fd52` | 일치 |
+| content / sim cohort 해시 | `ec277a27…` / `4bd9143334bb0871` | 같음 | 일치 |
+| 라벨 분포 | 0 / 23 / 130 / 87 | 0 / 23 / 130 / 87 | 일치 |
+| 재생성 diff | – | manifest `generated_at`·`build_commit`만, CSV는 줄바꿈만 | 정상 |
+| no_action 400분 | 판단 대기 0, 확정 부적격 0, 거짓 0, 확정 적격 0 | 같음 (검증 대기 75 / 정보 부족 165) | 일치 (초기 상태 1쌍은 `4f81460`의 74/166과 다름, 지표 영향 없음, 쌍 미특정) |
+| full_dcvc 400분·h10 | 47 / 130, 거짓 0 | 47 / 130, 거짓 0, result_hash `0a798d99c1df5cb5` (8afe5ea와 같음, 쌍 단위 차이 0) | 일치 |
+| full_dcvc 6000분·h80 | 20 / 23, 124 / 130, 거짓 0, 확정 적격 0 | 같음 | 일치 (행동 2,236 — 선우 dba06d9 보고 2,440과 다름, 최종 상태 같음. 후보 `b382176` 문서 소진 항목 보류) |
+| P0 127건 | 안전 101 / 오채택 22 / 과잉 보류 4 / 상충 15/27 | 같음 (사례별 차이 0) | 일치 |
+
+근거: `docs/dev/final_review_evidence/phase1_final_runs.json` (쌍별 최종 상태 포함), 통합본 자체 기록 `data/nsclc/eval/checks/*_phase1-final.json`과도 같음.
+
+### 9-3. 문서 갱신
+
+- `presentation_data_gt.md`: 슬라이드 1~5·5-1 기준 커밋을 phase1-final `b1d2a7f`로, `8afe5ea`는 노트로. 슬라이드 6의 "11/08 dba06d9 기준, 최종 통합본 실험 결과 아님"은 유지.
+- `demo_final_flow.md`: README §3.0과 맞춤 (포트 8011 → 8791, `--store`, `CTREC_SYNTHETIC_SIGNING_SECRET`, `verify_frozen` 확인), 시나리오 이름을 통합본 문서와 맞춤 (B = P052, P045 대체), C 문구 정정, E2E 4 / 10 출처 확인(PR #56).
+- `PHASE1_FINAL_INTEGRATION.md`: 모든 원격 브랜치에서 **위치 미확인**. README 9.1이 말하는 "통합 보고서"도 저장소에 없음. 대신 README §3.0 명령과 대조했습니다.
+
+### 9-4. 선우용 누락 목록
+
+1. `docs/presentation-data-gt`의 `eba0fc6`·`4fbe82b`(+ 이번 23시 커밋)를 phase1-final에 넣어 줘: `docs/dev/presentation_data_gt.md`(최종본), `docs/dev/demo_final_flow.md`, `docs/dev/final_review_2026-11-08.md`, `docs/dev/final_review_evidence/`, `docs/dev/final_review_scripts/`, `docs/dev/nsclc_eval_dataset.md`(GT 명칭 통일).
+   - 지금 phase1-final의 `presentation_data_gt.md`에는 400분 48, "20세 거짓 부적격 2케이스", `3e4b2fd` ablation 값이 남아 있음 → 발표 자료로 쓰면 틀린 값.
+   - `demo_nsclc_scenarios.md`는 통합본 판(`3eecd50`)을 유지하고 내 판은 넣지 않아도 됨.
+2. `PHASE1_FINAL_INTEGRATION.md`(통합 보고서)가 저장소에 없음. 실행 방법 8번 대조 요청이 있었는데 파일을 못 찾았어 — 올려 주거나 경로 알려 줘.
+3. `docs/proposals/p0_3_xfail_release.patch`는 `60d7921`과 같은 내용이라 넣지 않아도 됨.
+
+### 9-5. 동겸용 리허설 참고
+
+- 서버 명령은 README §3.0 그대로: 포트 **8791**, `--demo-staff --synthetic-verification --store <빈-폴더>`, `CTREC_SYNTHETIC_SIGNING_SECRET` 고정 (재시작 뒤 서류 확인·의사 판단이 인정되려면 필요).
+- phase1-final에는 PR #54(질문 고르기 화면), #55(보류 표시), `73ca6e5`(진행 중 요청 수), F-03(`e8ac1e5`, 의사 판단에 `expected_revision` 필수 — 화면이 이를 보내는지 확인)가 들어갔는데 README 9.1 기준 브라우저 화면은 아무도 열지 않음 → W1을 phase1-final에서 한 번 돌리고 녹화.
+- 백업 E2E 기대값: 참여 가능 확정 4 + 의사 판단 뒤 6 / 참여 불가 확정 4 / 미확정 10 / 안전 위반 0.
+- 오프라인 보조는 통합본 문서 이름 그대로 A(P052 × NCT07680790), B(P052 × NCT06928389). C는 "확보했다"고 말하지 않음.
 
 ## 7. 이 검수에서 바꾼 것 (docs/presentation-data-gt만)
 

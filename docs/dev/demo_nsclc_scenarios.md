@@ -3,7 +3,7 @@
 작성: 서연 (데이터) · 2026-11-08 · 최종 재확인: 통합본 `urgent/integration` `8afe5ea` (21시 검수)
 데이터: `data/nsclc/eval` (240쌍) · 실행: #20 runner, full_dcvc, 6000분, horizon 80, seed 1, 오프라인(LLM 0회)
 실행 기록: `docs/dev/final_review_evidence/demo_scenarios_8afe5ea.json`, `demo_pairs_8afe5ea.json` (이전 `data/nsclc/eval/checks/demo_scenarios_4f81460.json`)
-확정 발표 흐름: `docs/dev/demo_final_flow.md`
+확정 발표 흐름: `docs/dev/demo_final_flow.md` · 최종 통합본 `integration/phase1-final`의 같은 이름 문서가 기준이며, 이 파일은 21시 판에 23시 정정만 더한 것입니다
 
 > 합성 환자입니다(실제 환자 아님). **데이터 검증 완료 / 임상 검수 미완료.** 이 문서의 GT는 **축소 범위 규칙 GT (임상 전문가 미검수)**이며 아래에서 "규칙 GT"로 줄여 씁니다. 웹·엔진 코드는 바꾸지 않았습니다.
 
@@ -11,7 +11,7 @@
 |---|---|---|---|---|---|---|
 | A | P052 × NCT07680790 | 판단 기준 외 확인을 마치고 담당의 검토로 넘어감 | 전문가 판단 대기 적격 | EXPERT_REVIEW | EXPERT_REVIEW | ✓ |
 | B | P045 × NCT06928389 | 자기 보고 ECOG 2를 진료기록으로 확인한 뒤 부적격 확정 | 부적격 | CONFIRMED_INELIGIBLE | CONFIRMED_INELIGIBLE | ✓ |
-| C | **P058 × NCT07416058** (변경) | 환자가 "모름" → 처방 목록으로 확보 | 미평가 (범위 안 미연결 기준) | INFO_MISSING | INFO_MISSING | ✓ (확정하지 않음) |
+| C | **P058 × NCT07416058** (변경) | 환자가 "모름" → 투약 목록 요청은 처리됐지만 새 사실 0 → 확정하지 않음 | 미평가 (범위 안 미연결 기준) | INFO_MISSING | INFO_MISSING | ✓ (확정하지 않음) |
 | D | DEMO-REGION × NCT06216301 | 지역 조건: 국가를 모르면 확정하지 않음 | 미평가 (지역 조건) | CONFIRMED_INELIGIBLE ✗ | **INFO_MISSING** | ✓ (선우 `5fa4e24`로 고쳐짐) |
 
 - C 변경 사유: 이전 C(P061 × NCT06216301)의 "PD-L1 모름 → 병리 결과지" 흐름은 엔진 수정(`173cd3f`, E12 확인 항목) 뒤 더 나오지 않습니다. P061의 새 "모름 → 서류" 흐름은 I10(피임 동의, excluded)과 I8(기준값 없음, 미연결)이라 데모에 맞지 않습니다. 같은 선택 규칙(`scripts/demo_nsclc_scenarios.py`)이 고른 P058로 바꿨습니다. P061 × NCT06216301의 최종 상태는 여전히 INFO_MISSING입니다.
@@ -57,7 +57,7 @@
 
 데모 문구: "ECOG 2 (진료기록 확인) - 기준 0-1 불충족으로 부적격 확정". 자기 보고만으로는 확정하지 않다가 기록 확인 뒤 확정하는 흐름입니다.
 
-## C. 모름 → 처방 목록으로 확보 — P058 × NCT07416058 (드라이버 변이 대상 시험)
+## C. 값을 얻지 못하면 확정하지 않음 — P058 × NCT07416058 (드라이버 변이 대상 시험)
 
 **초기 입력 (공개 값):** 63세 여성, anti-PD-1/PD-L1 치료 있음, 큰 수술 없음
 
@@ -65,13 +65,14 @@
 |---|---|---|
 | 61 | 병리 결과지 요청 (드라이버 변이) | 성공 |
 | 69 | 환자 질문: I6 "a 2-week washout period is required for prior TKI therapy or chemotherapy" (마지막 항암 시점) | **환자 "모름"** (no_answer) |
-| 1840 | 처방 목록 요청 (I6) | **성공** — 환자가 모르는 값을 처방 목록으로 확보 |
+| 1840 | 투약 목록 요청 (I6) | 처리됨(succeeded)이지만 **새 사실 0** — I6은 여전히 미확인 (phase1-final 기록 step 1837) |
 
 **상태 변화:** INFO_MISSING 유지
 - 이 시험에는 범위 안 미연결 기준(I7 "Prior immunotherapy is not permitted.", I8 PD-L1 TPS 중앙 검사, E14·E15 임신·수유)이 남아 있습니다.
-- 그래서 확보 행동이 성공해도 확정하지 않는 것이 맞습니다. 규칙 GT도 NOT_EVALUATED입니다.
+- I6 값도 끝내 얻지 못했고, 미연결 기준도 남아 있어 확정하지 않는 것이 맞습니다. 규칙 GT도 NOT_EVALUATED입니다.
 
-데모 문구: "환자가 모르는 항목은 처방 목록으로 확인했습니다" / "남은 기준 중 원문만으로 판정할 수 없는 항목이 있어 확정하지 않습니다"
+데모 문구: "확인하지 못한 항목과 원문만으로 판정할 수 없는 항목이 남아 확정하지 않습니다". **"모르는 값을 서류로 확보했다"고 말하지 않습니다.**
+- 정정 (23시): 21시 판에서 "처방 목록으로 확보"라고 쓴 것은 행동 결과(succeeded)만 보고 쓴 오류였습니다. 통합본 `docs/dev/demo_nsclc_scenarios.md`의 기록대로 새 사실은 0건입니다. 240쌍 전체에서 "모름 → 같은 항목 서류 → 새 값 확보"인 쌍은 0개입니다(통합본 문서).
 - 주의: P058은 합성 값상 공개 항목 `repro.pregnant_or_breastfeeding = yes`(63세)인 합성 생성 결과입니다. 데모에서는 I6 흐름만 보여 줍니다.
 
 ## D. 지역 조건 — DEMO-REGION × NCT06216301 (평가셋 밖 데모 환자)

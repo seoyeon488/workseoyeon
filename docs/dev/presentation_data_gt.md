@@ -1,7 +1,7 @@
 # 발표 초안 — 데이터·GT 파트 (슬라이드 8장, 최종)
 
-작성: 서연 · 2026-11-08 최종 검수 + 선우 `dba06d9` 재실험 보고서 대조 반영 (`docs/dev/final_review_2026-11-08.md`)
-수치 기준: 평가셋·라벨은 `data/nsclc/eval` (생성 `996efd6`, 통합본 `urgent/integration` `8afe5ea`에서도 같은 파일). 240쌍 실행 수치는 최종 통합본 `8afe5ea` 값을 쓰고 다른 커밋 값은 노트로. DCV·번들링 ablation은 선우 `dba06d9` 재실험 값(최종 통합본 실험 결과 아님). 코호트는 슬라이드마다 제목 아래에 적고 서로 섞지 않습니다
+작성: 서연 · 2026-11-08 최종 검수 + 선우 `dba06d9` 보고서 대조 + 최종 통합본 `integration/phase1-final` `b1d2a7f` 재확인 반영 (`docs/dev/final_review_2026-11-08.md` 9절)
+수치 기준: 평가셋·라벨은 `data/nsclc/eval` (생성 `996efd6`, 통합본 `8afe5ea`·최종 통합본 `integration/phase1-final` `b1d2a7f`에서도 같은 파일, phase1-final에서 재생성해 해시 같음). 240쌍 실행 수치는 최종 통합본 `integration/phase1-final` `b1d2a7f` 값을 쓰고(통합본 `8afe5ea`와 같음) 다른 커밋 값은 노트로. DCV·번들링 ablation은 선우 `dba06d9` 재실험 값(최종 통합본 실험 결과 아님). 코호트는 슬라이드마다 제목 아래에 적고 서로 섞지 않습니다
 검증 수준: **데이터 검증 완료 / 임상 검수 미완료**
 명칭: 이 문서의 GT는 모두 **축소 범위 규칙 GT (임상 전문가 미검수)**입니다. 아래에서는 "규칙 GT"로 줄여 씁니다. 정확도·성능 향상 표현은 쓰지 않습니다.
 
@@ -9,7 +9,7 @@
 
 ## 슬라이드 1. 데이터 출처
 
-> 코호트: NSCLC 240쌍 평가셋 (`nsclc-eval-v1`) 데이터 · 기준 커밋: 평가셋 생성 `996efd6`, 최종 통합본 `8afe5ea`에서 같은 파일
+> 코호트: NSCLC 240쌍 평가셋 (`nsclc-eval-v1`) 데이터 · 기준 커밋: 최종 통합본 `integration/phase1-final` `b1d2a7f` (평가셋 생성 `996efd6`, phase1-final에서 재생성해 해시 같음 확인)
 
 핵심 문장
 - 실제 ClinicalTrials.gov NSCLC 프로토콜 8건 중 6건을 파싱해 기준 160개를 원문과 대조했습니다.
@@ -26,7 +26,7 @@
 
 ## 슬라이드 2. 축소 범위와 이유
 
-> 코호트: NSCLC 240쌍 평가셋 (`nsclc-eval-v1`) 데이터 · 기준 커밋: 평가셋 생성 `996efd6`, 최종 통합본 `8afe5ea`에서 같은 파일
+> 코호트: NSCLC 240쌍 평가셋 (`nsclc-eval-v1`) 데이터 · 기준 커밋: 최종 통합본 `integration/phase1-final` `b1d2a7f` (평가셋 생성 `996efd6`, phase1-final에서 재생성해 해시 같음 확인)
 
 핵심 문장
 - 슬롯으로 원문을 그대로 표현할 수 있는 기준만 규칙 GT를 계산합니다. 표현할 수 없으면 미연결로 남기고 판정하지 않습니다.
@@ -45,7 +45,7 @@
 
 ## 슬라이드 3. 규칙 GT 설계
 
-> 코호트: NSCLC 240쌍 평가셋 (`nsclc-eval-v1`) 데이터 · 기준 커밋: 평가셋 생성 `996efd6`, 최종 통합본 `8afe5ea`에서 같은 파일
+> 코호트: NSCLC 240쌍 평가셋 (`nsclc-eval-v1`) 데이터 · 기준 커밋: 최종 통합본 `integration/phase1-final` `b1d2a7f` (평가셋 생성 `996efd6`, phase1-final에서 재생성해 해시 같음 확인)
 
 핵심 문장
 - 생성 / 검토 / GT 계산을 분리했고, GT 코드는 엔진 코드를 import하지 않습니다.
@@ -61,7 +61,7 @@
 
 ## 슬라이드 4. 라벨 분포
 
-> 코호트: NSCLC 240쌍 평가셋 (`nsclc-eval-v1`) 데이터 · 기준 커밋: 평가셋 생성 `996efd6`, 최종 통합본 `8afe5ea`에서 같은 파일
+> 코호트: NSCLC 240쌍 평가셋 (`nsclc-eval-v1`) 데이터 · 기준 커밋: 최종 통합본 `integration/phase1-final` `b1d2a7f` (평가셋 생성 `996efd6`, phase1-final에서 재생성해 해시 같음 확인)
 
 핵심 문장
 - 240쌍 중 전문가 판단 대기 적격 23, 부적격 130, 미평가 87입니다.
@@ -78,7 +78,7 @@
 
 ## 슬라이드 5. 실행 결과 — 240쌍 평가셋 (입증된 것만)
 
-> 코호트: NSCLC 240쌍 평가셋 (`nsclc-eval-v1`, 80명 × 3시험) · 기준 커밋: 최종 통합본 `8afe5ea` (다른 커밋 값은 노트)
+> 코호트: NSCLC 240쌍 평가셋 (`nsclc-eval-v1`, 80명 × 3시험) · 기준 커밋: 최종 통합본 `integration/phase1-final` `b1d2a7f` (다른 커밋 값은 노트)
 
 핵심 문장
 - full_dcvc를 6000분·horizon 80·seed 1로 한 번 실행했을 때, 판단 대기 적격 23쌍 중 20쌍이 판단 기준 외 확인을 마치고 담당의 검토 상태에 도달했습니다.
@@ -87,23 +87,24 @@
 
 | 정책 · 예산 (seed 1, 1회) | 판단 대기 적격 → EXPERT_REVIEW | 확정 부적격 ∧ 규칙 GT 부적격 | 규칙 GT 부적격 아님 + 확정 부적격 | 확정 적격 | 출처 |
 |---|---|---|---|---|---|
-| no_action(행동 없음 기준점) · 400분 · horizon 10 | 0 / 23 | 0 / 130 | 0 | 0 | `data/nsclc/eval/checks/runner_400m_h10_4f81460.json` |
-| full_dcvc · 400분 · horizon 10 | 0 / 23 | **47** / 130 | 0 | 0 | `docs/dev/final_review_evidence/r400_three_commits.json` (`8afe5ea`) |
-| full_dcvc · 6000분 · horizon 80 | 20 / 23 | 124 / 130 | 0 | 0 | `docs/dev/final_review_evidence/runner_6000m_h80_8afe5ea_from_demo.json` |
+| no_action(행동 없음 기준점) · 400분 · horizon 10 | 0 / 23 | 0 / 130 | 0 | 0 | `data/nsclc/eval/checks/runner_400m_h10_phase1-final.json`, `docs/dev/final_review_evidence/phase1_final_runs.json` |
+| full_dcvc · 400분 · horizon 10 | 0 / 23 | **47** / 130 | 0 | 0 | 같음 |
+| full_dcvc · 6000분 · horizon 80 | 20 / 23 | 124 / 130 | 0 | 0 | `data/nsclc/eval/checks/runner_6000m_h80_phase1-final.json`, `phase1_final_runs.json` |
 
 노트
 - 400분 full_dcvc는 엔진 버전에 따라 다릅니다: `4f81460` 엔진 48, `dba06d9`·`8afe5ea` 47 (두 커밋 result_hash 같음). 갈린 쌍은 P034 × NCT07416058 1쌍(확정 부적격 → 검증 대기)입니다. 원인 후보는 `39ec3d2`(biomarker 기준의 확인 항목 묶음 변경)로 계획이 step 1부터 달라진 것입니다. 재현 불안정이 아닙니다. 출처: `docs/dev/final_review_evidence/r400_three_commits.json`
-- 6000분 값은 `4f81460`·`dba06d9`(선우 03 보고서 E1-c)·`8afe5ea` 모두 같습니다.
+- phase1-final 400분 full_dcvc의 result_hash(`0a798d99c1df5cb5`)는 `dba06d9`·`8afe5ea`와 같습니다. 6000분 값은 `4f81460`·`dba06d9`(선우 03 보고서 E1-c)·`8afe5ea`·phase1-final 모두 같습니다.
+- no_action 400분은 확정 0으로 같지만 초기 상태가 1쌍 다릅니다(검증 대기 74 → 75, 정보 부족 166 → 165, `4f81460` 대비). 표의 지표에는 영향이 없습니다.
 - no_action은 행동을 하지 않는 기준점입니다. 이 표는 DCV·번들링 효과의 근거가 아닙니다(슬라이드 6).
 - 축소 저장소에서 코호트 전용 기준을 빼면 거짓 부적격 6쌍이 생기는 결함을 데이터 단계에서 찾아 고쳤습니다(→ 0쌍). 출처: `docs/dev/nsclc_eval_dataset.md` §7 D7
 
 ## 슬라이드 5-1. P0 사례 (평가셋과 별도)
 
-> 코호트: P0 합성 사례 127건 (값 82 + 서술 20 + held-out 6 실패 25) · 기준 커밋: `4f81460` → `8afe5ea` · **합성 사례·오프라인 스텁 기준**
+> 코호트: P0 합성 사례 127건 (값 82 + 서술 20 + held-out 6 실패 25) · 기준 커밋: `4f81460` → 최종 통합본 `integration/phase1-final` `b1d2a7f` (`8afe5ea`와 사례별 결과 같음) · **합성 사례·오프라인 스텁 기준**
 
 - 기대값은 원문 처리 원칙으로만 작성했습니다(엔진 출력을 보고 정하지 않음).
 - 오채택 36 → 22, 상충 탐지 10/27 → 15/27, 과잉 보류 4 그대로, 나빠진 사례 0 (합성 사례·오프라인 스텁 기준, 근거 확인 함수 단위 측정, 건수이며 정확도 아님)
-- 출처: `docs/dev/final_review_evidence/p0_fact_cases_8afe5ea_score.md`, branch `data/p0-eval-cases`
+- 출처: `data/eval/p0_fact_cases/results/phase1-final_score.md` (phase1-final), `docs/dev/final_review_evidence/p0_fact_cases_8afe5ea_score.md`
 
 ## 슬라이드 6. DCV·번들링 ablation — 효과 미입증
 
@@ -156,7 +157,7 @@
 | 검사 수치 미포함 | 6개 시험 원문에 검사 기준값이 없어 검사 수치 기준 0건. NCT05255302 추가는 후속 과제 (재파싱 없이는 수동 보정 2건 필요, 이번에는 재파싱 안 함) | `lab_reference.json` |
 | 확정 적격 지표 없음 | 규칙 GT 확정 적격 0 | `label_summary.json` |
 | P0 남은 오채택 | 127건 중 22 (같은 항목 다른 값 7, 시점 차이 4, 부정 후 번복 4, 문서 vs 자가보고 서술 4, 다른 사람 값 2, held-out 상충 1). 합성 사례·오프라인 스텁 기준 | `p0_fact_cases_8afe5ea_score.md` |
-| 커밋별 차이 | 240쌍 400분 확정 부적격이 엔진 버전에 따라 48(`4f81460`) / 47(`dba06d9`·`8afe5ea`) | `r400_three_commits.json` |
+| 커밋별 차이 | 240쌍 400분 확정 부적격이 엔진 버전에 따라 48(`4f81460`) / 47(`dba06d9`·`8afe5ea`·phase1-final) | `r400_three_commits.json` |
 
 주장하지 않는 것: 임상 정확도·임상 성능, 전체 프로토콜 적격성, 확정 적격 관련 지표, DCV·번들링이 기준선보다 낫다는 주장, 실제 업무 시간 절감.
 
@@ -176,4 +177,5 @@
 | 한계 슬라이드 | 5개 항목 | 합성·축소 범위·미검수·가정 비용·DCV·번들링 미입증·검사 수치 미포함 | 검수 요청 항목 |
 | DCV·번들링 수치 | `3e4b2fd`(11-07) 데모·파일럿·생성기, 11.17 vs 8.17 | `dba06d9` 재실험 값, 코호트별 표 분리 | 선우 03·04 보고서 대조 (21:46) |
 | 400분 full_dcvc | 48 (`4f81460`) | 47 (`8afe5ea`), 48은 노트 | 엔진 버전 차이 확인 |
+| 기준 커밋 | `8afe5ea` | `integration/phase1-final` `b1d2a7f` (값 전부 같음, 8afe5ea는 노트) | 최종 통합 브랜치 대조 (23시) |
 | P0 슬라이드 | 실행 결과 슬라이드 안 | 슬라이드 5-1로 분리, "합성 사례·오프라인 스텁 기준" | 코호트 분리 |
