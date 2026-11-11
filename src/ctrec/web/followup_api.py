@@ -35,7 +35,7 @@ from pydantic import BaseModel, Field
 
 from .. import web_metering
 from ..followup import verification
-from ..followup.service import FollowupError, FollowupService, TrialCatalog
+from ..followup.service import NO_PATH_REASONS, FollowupError, FollowupService, TrialCatalog
 from ..followup.store import CaseStore
 from . import access, budget
 
@@ -369,6 +369,12 @@ class StatusChange(BaseModel):
     status: str = Field(pattern=r"^(unreachable|document_unavailable|cancelled)$")
 
 
+def _open_state(r: dict) -> str:
+    if r["status"] == "requires_clinician" and r.get("reason_code") in NO_PATH_REASONS:
+        return "on_hold"
+    return r["status"]
+
+
 @router.get("/staff/session")
 def staff_session(request: Request) -> dict:
     """화면이 연결 방식을 고름: 발표용 데모면 키 없이 바로, 아니면 담당자 키 입력. 비밀값은 돌려주지 않음."""
@@ -382,17 +388,21 @@ def staff_session(request: Request) -> dict:
 def staff_cases(request: Request) -> dict:
     require_staff(request)
     svc = service()
-    out = []
-    for cid in svc.store.case_ids():
-        d = svc.refresh_pairs(svc.store.load(cid))  # 사례 화면과 같은 쌍 상태 (권한이 바뀌면 저장값이 아니라 지금 권한 기준)
-        out.append({"case_id": cid, "created_at": d["created_at"], "revision": d["revision"],
-                    "synthetic": d["synthetic"], "pair_counts": _pair_counts(d["current"]["pairs"]),
-                    "open_requests": sum(1 for r in d["requests"] if r["status"] in ("pending", "requires_document",
-                                                                                     "requires_clinician")),
-                    # 열린 요청을 상태별로 (화면의 '지금 할 일' 안내용): 환자 답 대기 / 서류 대기 / 의사 판단 대기
-                    "open_by_status": {s: n for s in ("pending", "requires_document", "requires_clinician")
-                                       if (n := sum(1 for r in d["requests"] if r["status"] == s))}})
-    return {"cases": out}
+
+    def one(d):  # 손상된 사례 하나가 목록 전체를 막지 않음: refresh를 포함해 사례마다 격리 (감사 F-17)
+        cid = d["case_id"]
+        d = svc.refresh_pairs(d)  # 사례 화면과 같은 쌍 상태 (권한이 바뀌면 저장값이 아니라 지금 권한 기준)
+        return {"case_id": cid, "created_at": d["created_at"], "revision": d["revision"],
+                "synthetic": d["synthetic"], "pair_counts": _pair_counts(d["current"]["pairs"]),
+                "open_requests": sum(1 for r in d["requests"] if r["status"] in ("pending", "requires_document",
+                                                                                 "requires_clinician")),
+                # 열린 요청을 상태별로 (화면의 '지금 할 일' 안내용): 환자 답 대기 / 서류 대기 / 의사 판단 대기.
+                # 확인할 방법이 없어 멈춘 임상 검토(NO_PATH_REASONS)는 할 일이 아니라 on_hold로 따로 셈
+                "open_by_status": {s: n for s in ("pending", "requires_document", "requires_clinician", "on_hold")
+                                   if (n := sum(1 for r in d["requests"] if _open_state(r) == s))}}
+
+    out, unreadable = svc.each_readable_case(one)
+    return {"cases": out, "unreadable": unreadable}
 
 
 @router.get("/staff/queue")
@@ -437,6 +447,27 @@ def staff_insight(request: Request) -> dict:
     from .followup_insight import insight
     with _flow():
         return insight(service())
+
+
+class EstimatePick(BaseModel):
+    case_id: str = Field(min_length=1, max_length=80)
+    proposal_id: str = Field(min_length=1, max_length=200)
+
+
+class EstimateBody(BaseModel):
+    picks: list[EstimatePick] = Field(default_factory=list, max_length=200)
+    groups: list[list[EstimatePick]] = Field(default_factory=list, max_length=40)
+
+
+@router.post("/staff/insight/estimate")
+def staff_insight_estimate(body: EstimateBody, request: Request) -> dict:
+    """고른 확인들을 함께 보낼 때의 가정 비용·판정 가능 쌍(상한). 읽기만 하고 요청을 만들지 않음."""
+    access.check_state_changing(request)
+    require_staff(request)
+    from .followup_insight import estimate
+    with _flow():
+        return estimate(service(), [(p.case_id, p.proposal_id) for p in body.picks],
+                        [[(p.case_id, p.proposal_id) for p in g] for g in body.groups])
 
 
 @router.get("/staff/cases/{case_id}/inspector")
@@ -515,15 +546,16 @@ def staff_audit(case_id: str, request: Request) -> dict:
 
 def _open_queue(kind: str, status: str) -> dict:
     svc = service()
-    items = []
-    for cid in svc.store.case_ids():
-        d = svc.store.load(cid)
-        for r in d["requests"]:
-            if r["kind"] == kind and r["status"] == status:
-                items.append({"case_id": cid, "synthetic": d["synthetic"], "request_id": r["request_id"],
-                              "info_key": r.get("info_key"), "target_criteria": r["target_criteria"],
-                              "reason_code": r["reason_code"], "created_at": r["created_at"]})
-    return {"items": items}
+
+    def one(d):  # 사례마다 격리 (감사 F-17)
+        cid = d["case_id"]
+        return [{"case_id": cid, "synthetic": d["synthetic"], "request_id": r["request_id"],
+                 "info_key": r.get("info_key"), "target_criteria": r["target_criteria"],
+                 "reason_code": r["reason_code"], "created_at": r["created_at"]}
+                for r in d["requests"] if r["kind"] == kind and r["status"] == status]
+
+    per_case, unreadable = svc.each_readable_case(one)
+    return {"items": [x for xs in per_case for x in xs], "unreadable": unreadable}
 
 
 @router.get("/verifier/queue")

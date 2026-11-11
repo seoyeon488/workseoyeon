@@ -11,7 +11,7 @@ import json
 
 from . import config, conservative_view, llm
 from .agents.matcher import compact
-from .pipeline import Session
+from .pipeline import Session, _not_evaluated
 from .tools import ctgov
 
 SYSTEM = """당신은 인터랙티브 임상시험 추천 시스템의 '오케스트레이터 에이전트'입니다.
@@ -147,7 +147,21 @@ class Orchestrator:
     def _finalize_recommendation(self, _):
         if not self.s.matches:
             raise RuntimeError("평가된 시험이 없습니다. evaluate_trials를 먼저 호출하세요.")
-        self.s.finalize()
+        # 평가하지 않은 후보도 결과에 남김 (조용히 빠지거나 '모두 불충족'으로 묶이지 않도록). 판정은 만들지 않음 (감사 F-02)
+        unevaluated = [t for t in self.s.candidate_ids() if t not in self.s.matches]
+        for tid in unevaluated:
+            self.s.matches[tid] = _not_evaluated(
+                self.s.case.patient_id, tid, "평가하지 않은 채 마무리됨: 오케스트레이터가 이 후보를 평가하기 전에 추천을 마무리함")
+        if unevaluated:
+            self.s.tracer.log("orchestrator", "unevaluated_at_finalize", trial_ids=unevaluated,
+                              message=f"미평가 후보 {len(unevaluated)}개를 NOT_EVALUATED로 기록")
+        try:
+            self.s.finalize()
+        except Exception:
+            # 마무리가 실패하면 자리표시를 되돌림: 남아 있으면 안전장치가 그 후보를 '평가함'으로 보고 건너뜀 (감사 F-02)
+            for tid in unevaluated:
+                self.s.matches.pop(tid, None)
+            raise
         self.done = True
         rec = conservative_view.build(self.s).result["recommendation"]  # 모델이 쓰는 종료 문구도 표현 사본만 봄
         return {"recommended": [r["trial_id"] for r in rec["recommended"]],
@@ -183,6 +197,12 @@ class Orchestrator:
             results = []
             for block in response.content:
                 if block.type != "tool_use":
+                    continue
+                if self.done:
+                    # 마무리 뒤 같은 턴의 호출은 실행하지 않음: 판정만 바뀌고 추천은 옛 판정으로 남음 (감사 F-01)
+                    results.append({"type": "tool_result", "tool_use_id": block.id, "is_error": True,
+                                    "content": "Error: finalize_recommendation 이후의 도구 호출은 실행하지 않습니다."})
+                    s.tracer.log("orchestrator", "tool_rejected", tool=block.name, message="after_finalize")
                     continue
                 s.tracer.log("orchestrator", "tool_call", tool=block.name, input=block.input, message=block.name)
                 handler = getattr(self, f"_{block.name}", None)

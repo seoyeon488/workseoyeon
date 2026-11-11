@@ -362,10 +362,11 @@ python eval/evaluate.py --labels data/labels/masked_labels.csv --outputs outputs
 | `--answers interactive` | 터미널에서 사람이 직접 답변 (시연용) | |
 | `--answers simulated` | 가상 환자의 `hidden_details`를 아는 LLM이 답변 (개발·평가용) | |
 | `--answers none` | 답변 없이 질문만 기록 | ✅ |
-| `--max-rounds N` | 확인 질문 최대 라운드 | 2 |
+| `--max-rounds N` | 확인 질문 최대 라운드 (환경 변수 `CTREC_MAX_CLARIFY_ROUNDS`로 기본값 변경) | 2 |
 | `--candidates screen` | 불러온 시험 전체를 풀로 보고 후보 추림 에이전트가 고름 | ✅ |
 | `--candidates given` | 환자 파일의 `candidate_trials` 또는 `--topic-map`에 정한 후보만 평가 (이전 방식, 라벨이 있는 쌍만 평가할 때) | |
-| `--max-candidates N` | 후보 추림 후 자세히 평가할 최대 시험 수. 시험 풀이 이보다 작으면 추림 없이 전부 평가. **5는 실험 전 임시값**입니다. D3 결정에 따라 `scripts/screen_budget.py`(recall@k)로 정합니다 | 5 (임시) |
+| `--max-candidates N` | 후보 추림 후 자세히 평가할 최대 시험 수. 시험 풀이 이보다 작으면 추림 없이 전부 평가. **5는 실험 전 임시값**입니다. D3 결정에 따라 `scripts/screen_budget.py`(recall@k)로 정합니다. 기본값은 환경 변수 `CTREC_SCREEN_MAX`로 바꿉니다 | 5 (임시) |
+| `CTREC_MAX_STEPS` (환경변수) | agent 모드 오케스트레이터 도구 호출 루프의 최대 반복 횟수 | 15 |
 | `CTREC_MAX_QUESTIONS` (환경변수) | 라운드당 최대 질문 수 (`batch`·`adaptive` 정책의 한도). **5는 실험 전 임시값**입니다 | 5 (임시) |
 | `CTREC_QUESTION_POLICY` (환경변수) | 한 라운드에 묶을 질문 수 정책 (D4). `single` 항상 1개 / `batch` 한도까지 / `adaptive` 서로 독립적이고 판정을 바꿀 질문만 함께. 기본 `adaptive`는 권장안이며 `scripts/question_policy_sweep.py` 결과로 확정합니다 | adaptive (임시) |
 | `compile_trials.py --unfreeze` | 잠긴 기준표(`data/parsed/FROZEN.json`)의 시험도 다시 컴파일해 덮어씀. 팀 검토 후에만 쓰고, 끝나면 `scripts/freeze_parsed.py`로 다시 잠급니다 | off |
@@ -574,7 +575,7 @@ python scripts/generate_synthetic_patients.py --trial data/trials/NCT0XXXXXXX.js
 - **캐싱**
   - 에이전트별 시스템 프롬프트에 프롬프트 캐싱을 적용합니다.
   - 시험 기준은 `scripts/compile_trials.py`로 미리 파싱·검증해 `data/parsed/`(git 포함)에 고정합니다. 2026-10-12에 26개 시험 전부를 공식 기준표로 잠갔습니다(`FROZEN.json`, 파일이 바뀌면 테스트 실패). 환자를 평가할 때는 파싱하지 않습니다. 시험 기준 원문이 바뀌면 그 시험은 `COMPILATION_PENDING`이 되므로 다시 컴파일합니다. `data/cache/parsed/`는 컴파일·즉석 파싱용 내부 캐시입니다.
-- **안전 분류기 대응**: 의료 텍스트가 드물게 모델의 안전 분류기에 의해 거절될 수 있습니다. 이 경우를 대비해 Claude API의 서버측 refusal fallback(`fallbacks: "default"`)을 기본으로 켜 두었습니다. Bedrock이나 Vertex 등 다른 플랫폼에서는 `.env`에 `CTREC_FALLBACKS=0`을 설정하세요.
+- **안전 분류기 대응**: 의료 텍스트가 드물게 모델의 안전 분류기에 의해 거절될 수 있습니다. 이 경우를 대비해 Claude API의 서버측 refusal fallback(`fallbacks: "default"`)을 기본으로 켜 두었습니다. Bedrock이나 Vertex 등 다른 플랫폼에서는 `.env`에 `CTREC_FALLBACKS=0`을 설정하세요. 코드 기본값은 켜짐(`CTREC_FALLBACKS` 미설정 = 1)이지만, `.env.example`과 `render.yaml`은 `CTREC_FALLBACKS=0`(꺼짐)으로 두므로 `.env.example`을 복사해 쓰면 꺼진 상태입니다. 웹 실제 분석과 파일럿 실행 전 점검은 0을 요구합니다.
 - **비용 규모**: 환자 1명 × 시험 N개 기준으로 대략 다음 횟수만큼 Claude를 호출합니다.
   - 후보 추림: 1회 (약 $0.03. 시험 풀 설명은 시스템 프롬프트에 넣어 환자가 바뀌어도 캐시로 재사용). 자세한 판정은 고른 시험 N개(최대 5개)에만 합니다
   - 기준 파싱: 0회 (사전 컴파일한 고정 저장소 사용. 컴파일은 시험당 파싱 3회 + 검증 1회를 한 번만)
@@ -598,6 +599,46 @@ python scripts/generate_synthetic_patients.py --trial data/trials/NCT0XXXXXXX.js
 ## 10. 변경 이력
 
 수정할 때마다 무엇을 왜 바꿨는지 여기에 기록합니다. 최신 항목이 위에 옵니다.
+
+### 2026-11-08 — 연구 담당자 화면을 '질문 고르기' 중심으로 (핵심 아이디어 전달, 동겸)
+
+배경: 핵심은 연구진이 다음에 확인할 질문을 고르고 같은 서류로 묶어 코디네이터 시간을 줄이는 것인데, 화면에서는 절약 숫자가 요약 칸 작은 글씨에, 질문별 비용은 카드 네 줄 숫자 사이에, 추천 순서는 따로 '전체 순서' 탭에 흩어져 있었습니다. 고른 질문을 합쳐 얼마나 줄어드는지도 보이지 않았습니다. 팀 제안서(프런트엔드 UX·노벨티 개선)의 B(다음 확인 행동)+A(정보 계층)를 반영했습니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | 맨 위: 한 문장("신청한 환자 전체를 보고 다음에 확인할 질문을 고르고, 환자마다 같은 서류로 확인할 것을 묶어 여러 시험의 판정에 필요한 연락을 줄여요") + '하나씩 따로 → 환자마다 같은 서류로 묶으면 → 줄어드는 시간' 세 숫자. 다 보낸 뒤에는 '보낸 요청을 하나씩 했다면 → 묶어 보낸 시간 → 줄어든 시간'. 묶음 절약은 (환자, 서류)마다 연락비를 한 번 매기는 원장 규칙에서 나오므로 환자 한 명 안의 절약이고, 환자 사이에서는 추천 순서(시간 배분)만 정함 | `static/staff.js`, `staff.css` |
+| 2 | 질문 카드 = 연락 한 번(서류 한 장 또는 환자 질문 하나): 추천 순위·무엇을·누구에게·왜(이 질문까지 하면 결과가 나올 수 있는 시험 +N, 상한)·시간(묶어서 / 하나씩 / 절약). 체크로 고르고, 처음엔 추천 3개를 골라 둠. 나머지·이미 보낸 질문은 접음 | `static/staff.js`, `staff.css` |
+| 3 | 아래 고정 바: 고른 질문 n개를 함께 보낼 때 시간·하나씩 할 때·절약·결과가 나올 수 있는 시험 +N, '고른 질문 보내기' 버튼 하나 | `static/staff.js`, `index.html` |
+| 4 | '이 시간이면?' (접힘): 추천 순서 누적 곡선 위 슬라이더로 쓸 분을 고르면 결과가 나올 수 있는 시험 최대 수 (예산 제한은 적용하지 않음) | `static/staff.js` |
+| 5 | 고른 질문 합계 API `POST /api/followup/staff/insight/estimate {picks, groups}`: insight와 같은 원장·같은 추천 순서로 계산 (이미 보낸 요청을 먼저 청구, 같은 환자·같은 정보원 한 번). 읽기만 하고 요청을 만들지 않음. insight의 복원 부분을 `_prepare`로 나눠 함께 씀 | `web/followup_insight.py`, `web/followup_api.py` |
+| 6 | 탭: '① 질문 고르기' / '② 받은 서류·판단 처리'. '전체 순서' 탭은 질문 카드의 추천 순위로 합침 (숨김) | `index.html` |
+| 7 | 발표용 데모 서버: 연구 담당자를 앞에, 환자는 '환자 신청 (시연용)' (환자 한 명이 정보를 내는 장면, 연구진 화면은 신청한 환자 전체의 업무함). 진행 중인 환자 사례가 없으면 `/`에서 연구진 화면부터 | `static/staff.js` |
+| 8 | 테스트 4건: 같은 결과지 묶음이 하나씩보다 싸고, 전부 고르면 화면 카드의 분 합과 같고, 요청을 만들지 않고, 이미 보낸·없는 제안은 세지 않고, 담당자·요청 헤더가 필요 | `tests/test_insight_estimate.py` (신규) |
+
+표현 규칙: 모든 분은 엔진 카탈로그의 가정 비용(실측 아님), 시험 수는 답이 모두 온다고 볼 때의 상한, 순서는 '추천 순서(Cohort C) · 예산 제한은 적용하지 않음'. 추천 순서 vs 환자 순서 비교는 넣지 않았습니다(11-07 결정). 판정·권한은 바뀌지 않습니다.
+### 2026-11-08 — '의사 판단 기다림'인데 의사가 끝낼 수 없는 요청 (발표 데모, 동겸)
+
+배경: 서류를 '구할 수 없어요'로 표시해서 남은 정보원이 없으면 서버가 임상 검토 요청(`item_sources_exhausted`, 충돌은 `conflict_unresolved`)을 자동으로 만듭니다(#39 계약). 그런데 대상이 혈소판·EGFR처럼 값이 있어야 하는 기준이면 의사 판단 기준이 아니라서 판단 API로 끝낼 수 없습니다(`judgeable=False`). 쌍은 '확인할 방법 없음'으로 보류되고, 이것이 안전한 결과입니다. 화면만 이 요청을 '의사 판단 기다림'으로 보여 주고 할 일로 세서, 기다리면 끝날 것처럼 보였습니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | 담당자 사례 화면: 이 요청을 '해야 할 일'에서 빼고 '추가 확인 경로가 없어 보류된 것'에 "추가 확인 경로 없음 · 보류"로 보여 줌 (이유와 "새 서류가 생기면 다시 요청" 안내) | `src/ctrec/web/static/staff.js` |
+| 2 | 담당자 환자 목록 `open_by_status`: 이 요청은 `requires_clinician`이 아니라 `on_hold`로 셈 → '지금 할 일'·할 일 개수에서 빠짐 | `src/ctrec/web/followup_api.py` |
+| 3 | 환자 화면 `in_progress`: '의사 선생님이 판단하고 있어요' 대신 '더 확인할 방법이 없어 보류했어요' (`status: on_hold`, 저장 상태는 그대로) | `src/ctrec/followup/service.py`, `static/followup.js` |
+| 4 | 테스트 1건: 서류를 모두 소진한 혈소판 → `on_hold`로 세고 환자에게도 `on_hold` | `tests/test_demo_roles.py` |
+| 5 | 문구 통일 (선우 제안, 11-08): `BLOCKED_FAILURE`와 이 요청을 '추가 확인 경로 없음 · 보류'로 (참여 불가·의사 판단 필요가 아님). 담당자 시험 상태·현황판·요청 카드 같은 문구, 환자 화면은 '더 확인할 방법이 없어 보류했어요' | `static/staff.js`, `cohort.js`, `followup.js` |
+
+판정·권한·저장 상태는 바뀌지 않습니다(표시와 개수만). 기준 목록은 `followup.service.NO_PATH_REASONS` 하나.
+### 2026-11-08 — 불충족 근거 확인 요청이 다른 서류 확인 뒤 닫혀 쌍이 멈추던 문제 (브라우저에서 발견, 동겸)
+
+배경: 예시 사례 S003(7세)처럼 자기 보고 나이로 'Age >= 18'이 불충족이면 쌍은 VERIFICATION_PENDING(`exclusion_unverified`, "안 맞는 이유를 서류로 확인")이고, 엔진은 근거 확인 요청(`basis:age`, `exclusion_basis_unverified`)을 냅니다. 그런데 `_supersede`가 열린 기준을 정보 빈칸(gap)으로만 세서, 값이 있어 gap이 없는 그 기준의 근거 확인 요청이 다른 서류 확인(혈소판 등)의 재평가에서 `targets_resolved`로 닫혔습니다. 같은 제안은 다시 나오지 않아 네 쌍이 '서류 확인 필요'인데 할 일 0개로 멈췄습니다. 잘못 확정한 것은 아니고(안전), 확정할 길이 없어진 문제입니다.
+
+| # | 변경 | 파일 |
+|---|---|---|
+| 1 | `_supersede`의 열린 기준에 '아직 문서로 검증되지 않은 불충족 근거 기준'을 더함 (쌍이 open·provisional 불충족일 때 `mismatch_basis` 중 `basis_tier != verified`, `decision_policy`의 `exclusion_basis_unverified` 제안과 같은 조건). 대상 기준이 정말 닫힌 요청은 그대로 닫힘 | `src/ctrec/followup/service.py` (선우 담당, 8줄) |
+| 2 | 테스트 2건: 16세 자기 보고 → 혈소판 서류 확인 뒤에도 나이 근거 요청이 열려 있고(수정 전 실패), 나이 확인 뒤 참여 불가(확정) / 근거 요청만 있을 때 확인하면 확정되고 남은 요청이 닫힘 | `tests/test_exclusion_basis_request.py` (신규) |
+
+브라우저 확인(데모 서버, S003 7세): 서류 확인 4건 동안 '나이 기록' 요청 유지 → 나이 확인 끝 → T-A~D 참여 불가(확정), 할 일 0개. 이미 닫힌 옛 사례의 요청은 되살리지 않습니다(새 사례부터 적용).
 
 ### 2026-11-08 — 환자 화면이 '확인 중'에 멈춘 것처럼 보이던 문제 (발표 데모, 동겸)
 
